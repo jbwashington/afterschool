@@ -1,0 +1,25 @@
+# Caddyfile for Raspberry Pi deployment
+# Replace {$DOMAIN} with your domain or use localhost for local testing
+
+{$DOMAIN:localhost} {
+    # Serve static client files
+    root * /app/dist
+    file_server
+
+    # Proxy WebSocket connections to Node.js server
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket localhost:3001
+
+    # Enable gzip compression
+    encode gzip
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+}
