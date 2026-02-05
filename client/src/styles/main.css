@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Card styles */
+.feature-card {
+  @apply bg-gray-800 rounded-xl p-4 w-40 cursor-pointer transition-all duration-200;
+  @apply hover:bg-gray-700 hover:scale-105 hover:-translate-y-1;
+  @apply border-2 border-transparent;
+}
+
+.feature-card.selected {
+  @apply border-yellow-400 bg-gray-700 scale-105 -translate-y-1;
+}
+
+.feature-card.disabled {
+  @apply opacity-50 cursor-not-allowed hover:scale-100 hover:translate-y-0;
+}
+
+.feature-card .card-icon {
+  @apply text-4xl mb-2 block text-center;
+}
+
+.feature-card .card-name {
+  @apply font-bold text-sm text-center mb-1;
+}
+
+.feature-card .card-description {
+  @apply text-xs text-gray-400 text-center;
+}
+
+.feature-card .card-category {
+  @apply text-xs uppercase tracking-wide text-gray-500 text-center mt-2;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Role badges */
+.role-designer {
+  @apply bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold;
+}
+
+.role-tester {
+  @apply bg-green-600 text-white px-2 py-1 rounded text-xs font-bold;
+}
