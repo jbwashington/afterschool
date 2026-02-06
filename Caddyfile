@@ -11,7 +11,7 @@
         header Connection *Upgrade*
         header Upgrade websocket
     }
-    reverse_proxy @websocket localhost:3001
+    reverse_proxy @websocket localhost:6767
 
     # Enable gzip compression
     encode gzip

@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws'
 import { RoomManager } from './rooms/RoomManager.js'
 import { MESSAGE_TYPES } from '../shared/constants.js'
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 6767
 
 const wss = new WebSocketServer({ port: PORT })
 const roomManager = new RoomManager()

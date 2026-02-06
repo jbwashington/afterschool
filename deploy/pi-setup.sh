@@ -46,7 +46,7 @@ ExecStart=/usr/bin/node server/index.js
 Restart=on-failure
 RestartSec=10
 Environment=NODE_ENV=production
-Environment=PORT=3001
+Environment=PORT=6767
 
 [Install]
 WantedBy=multi-user.target

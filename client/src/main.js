@@ -66,7 +66,7 @@ class App {
     }
 
     // Connect to server
-    const wsUrl = `ws://${window.location.hostname}:3001?room=${roomId}&mode=${this.mode}`
+    const wsUrl = `ws://${window.location.hostname}:6767?room=${roomId}&mode=${this.mode}`
     this.network = new NetworkClient(wsUrl)
 
     this.network.onConnected = (data) => this.handleConnected(data)
