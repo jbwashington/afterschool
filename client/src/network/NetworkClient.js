@@ -13,6 +13,9 @@ export class NetworkClient {
     this.onTurnEnd = null
     this.onCardSelected = null
     this.onWorldUpdate = null
+    this.onEntitySpawn = null
+    this.onSkyChange = null
+    this.onClearAll = null
     this.onError = null
     this.onDisconnected = null
   }
@@ -102,6 +105,18 @@ export class NetworkClient {
         if (this.onConnected) {
           this.onConnected({ gameState: message.state })
         }
+        break
+
+      case 'entity_spawn':
+        if (this.onEntitySpawn) this.onEntitySpawn(message)
+        break
+
+      case 'sky_change':
+        if (this.onSkyChange) this.onSkyChange(message)
+        break
+
+      case 'clear_all':
+        if (this.onClearAll) this.onClearAll()
         break
 
       case 'error':

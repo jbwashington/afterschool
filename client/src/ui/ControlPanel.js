@@ -1,0 +1,154 @@
+// Control Panel for live building - kids see changes instantly!
+export class ControlPanel {
+  constructor(onAction) {
+    this.onAction = onAction
+    this.container = null
+    this.categories = {
+      ground: {
+        label: '🌍 Ground',
+        items: [
+          { id: 'grass', name: 'Grass', icon: '🌿', color: 0x7ec850 },
+          { id: 'sand', name: 'Sand', icon: '🏖️', color: 0xf4d03f },
+          { id: 'snow', name: 'Snow', icon: '❄️', color: 0xf0f8ff },
+          { id: 'stone', name: 'Stone', icon: '🪨', color: 0x808080 },
+        ]
+      },
+      buildings: {
+        label: '🏠 Buildings',
+        items: [
+          { id: 'house', name: 'House', icon: '🏠', mesh: 'house' },
+          { id: 'tower', name: 'Tower', icon: '🗼', mesh: 'tower' },
+          { id: 'playground', name: 'Playground', icon: '🎠', mesh: 'playground' },
+        ]
+      },
+      nature: {
+        label: '🌳 Nature',
+        items: [
+          { id: 'tree', name: 'Tree', icon: '🌳', mesh: 'tree', color: 0x2d5a27 },
+          { id: 'flowers', name: 'Flowers', icon: '🌸', mesh: 'flowers' },
+          { id: 'pond', name: 'Pond', icon: '💧', mesh: 'pond' },
+        ]
+      },
+      creatures: {
+        label: '🐱 Creatures',
+        items: [
+          { id: 'robot_cat', name: 'Robot Cat', icon: '🐱', mesh: 'robot_cat', animation: { type: 'wander', speed: 0.5, radius: 5 } },
+          { id: 'butterflies', name: 'Butterflies', icon: '🦋', mesh: 'butterfly', animation: { type: 'flutter', height: 2 } },
+        ]
+      },
+      decorations: {
+        label: '✨ Decorations',
+        items: [
+          { id: 'lamp', name: 'Street Lamp', icon: '💡', mesh: 'lamp' },
+          { id: 'rainbow', name: 'Rainbow', icon: '🌈', mesh: 'rainbow' },
+        ]
+      },
+      sky: {
+        label: '🌈 Sky',
+        items: [
+          { id: 'sky_blue', name: 'Day', icon: '☀️', skyColor: 0x87ceeb },
+          { id: 'sky_sunset', name: 'Sunset', icon: '🌅', skyColor: 0xffb347 },
+          { id: 'sky_night', name: 'Night', icon: '🌙', skyColor: 0x1a1a2e },
+          { id: 'sky_pink', name: 'Pink', icon: '💜', skyColor: 0xffb6c1 },
+        ]
+      },
+    }
+    this.build()
+  }
+
+  build() {
+    this.container = document.createElement('div')
+    this.container.id = 'control-panel'
+    this.container.className = 'fixed left-4 top-1/2 -translate-y-1/2 bg-black/80 rounded-2xl p-4 max-h-[80vh] overflow-y-auto pointer-events-auto'
+    this.container.innerHTML = `
+      <h2 class="text-lg font-bold mb-4 text-center">🛠️ Build</h2>
+      <div id="panel-categories" class="space-y-4"></div>
+    `
+
+    const categoriesContainer = this.container.querySelector('#panel-categories')
+
+    for (const [key, category] of Object.entries(this.categories)) {
+      const categoryEl = document.createElement('div')
+      categoryEl.className = 'panel-category'
+      categoryEl.innerHTML = `
+        <div class="text-sm font-medium text-gray-300 mb-2">${category.label}</div>
+        <div class="grid grid-cols-3 gap-2" data-category="${key}"></div>
+      `
+
+      const itemsGrid = categoryEl.querySelector('[data-category]')
+
+      for (const item of category.items) {
+        const btn = document.createElement('button')
+        btn.className = 'panel-btn flex flex-col items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all hover:scale-105 active:scale-95'
+        btn.dataset.itemId = item.id
+        btn.innerHTML = `
+          <span class="text-2xl">${item.icon}</span>
+          <span class="text-xs mt-1 text-gray-300">${item.name}</span>
+        `
+        btn.addEventListener('click', () => this.handleClick(key, item))
+        itemsGrid.appendChild(btn)
+      }
+
+      categoriesContainer.appendChild(categoryEl)
+    }
+
+    // Add clear button
+    const clearBtn = document.createElement('button')
+    clearBtn.className = 'w-full mt-4 p-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors'
+    clearBtn.textContent = '🗑️ Clear All'
+    clearBtn.addEventListener('click', () => this.onAction({ type: 'clear_all' }))
+    categoriesContainer.appendChild(clearBtn)
+  }
+
+  handleClick(category, item) {
+    // Generate random position within bounds
+    const x = (Math.random() - 0.5) * 16
+    const z = (Math.random() - 0.5) * 16
+
+    if (category === 'ground') {
+      this.onAction({
+        type: 'spawn',
+        entity: {
+          type: 'ground',
+          mesh: 'ground',
+          position: { x: 0, y: 0, z: 0 },
+          scale: { x: 20, y: 0.1, z: 20 },
+          color: item.color,
+        }
+      })
+    } else if (category === 'sky') {
+      this.onAction({
+        type: 'change_sky',
+        color: item.skyColor,
+      })
+    } else {
+      this.onAction({
+        type: 'spawn',
+        entity: {
+          type: item.id,
+          mesh: item.mesh || item.id,
+          position: { x, y: 0, z },
+          scale: { x: 1, y: 1, z: 1 },
+          color: item.color || 0xffffff,
+          animation: item.animation || null,
+        }
+      })
+    }
+  }
+
+  mount(parent) {
+    parent.appendChild(this.container)
+  }
+
+  unmount() {
+    this.container?.remove()
+  }
+
+  show() {
+    this.container.classList.remove('hidden')
+  }
+
+  hide() {
+    this.container.classList.add('hidden')
+  }
+}

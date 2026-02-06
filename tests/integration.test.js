@@ -160,12 +160,15 @@ describe('Integration: Audio Signal Handling', () => {
   })
 
   it('should apply rules that respond to audio', () => {
-    // Add a clap rule
+    // Spawn an entity first (world starts empty)
+    const entity = room.gameState.spawnEntity({ type: 'ground', color: 0x00ff00 })
+
+    // Add a clap rule targeting that entity
     room.gameState.addRule({
       id: 'test-clap-rule',
       trigger: 'audio',
       condition: 'clap',
-      effect: { type: 'change_color', targetId: 'entity_1', color: 0xff0000 }
+      effect: { type: 'change_color', targetId: entity.id, color: 0xff0000 }
     })
 
     // Send a clap signal (high peak)
@@ -180,13 +183,13 @@ describe('Integration: Audio Signal Handling', () => {
     ws1.send.mockClear()
     ws2.send.mockClear()
 
-    // Add a working rule
-    const groundEntity = Array.from(room.gameState.entities.values())[0]
+    // Spawn an entity first (world starts empty)
+    const testEntity = room.gameState.spawnEntity({ type: 'ground', color: 0x00ff00 })
     room.gameState.addRule({
       id: 'test-rule',
       trigger: 'audio',
       condition: 'clap',
-      effect: { type: 'change_color', targetId: groundEntity.id, color: 0xff0000 }
+      effect: { type: 'change_color', targetId: testEntity.id, color: 0xff0000 }
     })
 
     // Send clap signal

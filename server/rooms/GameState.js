@@ -6,19 +6,7 @@ export class GameState {
     this.nextEntityId = 1
     this.activeRules = []
     this.appliedFeatureIds = []
-
-    // Initialize default world
-    this.initializeWorld()
-  }
-
-  initializeWorld() {
-    // Add ground plane
-    this.spawnEntity({
-      type: ENTITY_TYPES.GROUND,
-      position: { x: 0, y: 0, z: 0 },
-      scale: { x: 20, y: 0.1, z: 20 },
-      color: 0x7ec850,
-    })
+    // Start with empty world - kids build from scratch!
   }
 
   get entityCount() {

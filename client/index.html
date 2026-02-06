@@ -18,7 +18,7 @@
       <header class="p-4 flex justify-between items-start pointer-events-auto">
         <div id="game-info" class="bg-black/50 rounded-lg p-3">
           <h1 class="text-xl font-bold">🏘️ Town Builders Council</h1>
-          <p id="turn-info" class="text-sm text-gray-300">Waiting for players...</p>
+          <p id="turn-info" class="text-sm text-gray-300">Build your world!</p>
         </div>
         <div id="player-info" class="bg-black/50 rounded-lg p-3 text-right">
           <p id="player-role" class="text-sm">-</p>
@@ -26,12 +26,11 @@
         </div>
       </header>
 
-      <!-- Card Selection Area -->
+      <!-- Card Selection Area (for turn-based mode) -->
       <div id="card-area" class="absolute bottom-0 left-0 right-0 p-4 hidden">
         <div class="max-w-4xl mx-auto">
           <h2 class="text-center text-lg mb-3" id="phase-instruction">Choose a card:</h2>
           <div id="cards-container" class="flex justify-center gap-4 flex-wrap pointer-events-auto">
-            <!-- Cards will be inserted here -->
           </div>
         </div>
       </div>
@@ -56,23 +55,33 @@
 
   <!-- Join Modal -->
   <div id="join-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-    <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 text-center">
-      <h1 class="text-3xl font-bold mb-2">🏘️ Town Builders Council</h1>
-      <p class="text-gray-400 mb-6">A game where you build the game!</p>
+    <div class="bg-gray-800 rounded-xl p-8 max-w-lg w-full mx-4 text-center">
+      <h1 class="text-4xl font-bold mb-2">🏘️ Town Builders</h1>
+      <p class="text-gray-400 mb-8 text-lg">Build your own 3D world!</p>
 
-      <div class="space-y-4">
-        <button id="btn-new-room" class="w-full bg-blue-600 hover:bg-blue-700 py-3 px-6 rounded-lg font-medium transition-colors">
-          Create New Room
+      <div class="space-y-6">
+        <!-- Start Building Button -->
+        <button id="btn-new-room" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 py-4 px-6 rounded-xl font-bold text-xl transition-all transform hover:scale-105">
+          🎨 Start Building!
         </button>
-        <div class="text-gray-500">or</div>
-        <div class="flex gap-2">
-          <input id="room-code-input" type="text" placeholder="Enter room code"
-            class="flex-1 bg-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <button id="btn-join-room" class="bg-green-600 hover:bg-green-700 py-3 px-6 rounded-lg font-medium transition-colors">
-            Join
-          </button>
+
+        <!-- Join existing room -->
+        <div class="pt-4 border-t border-gray-700">
+          <p class="text-gray-500 mb-3">Join a friend's world:</p>
+          <div class="flex gap-2">
+            <input id="room-code-input" type="text" placeholder="Room code"
+              class="flex-1 bg-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center uppercase tracking-widest text-lg">
+            <button id="btn-join-room" class="bg-green-600 hover:bg-green-700 py-3 px-6 rounded-lg font-medium transition-colors">
+              Join
+            </button>
+          </div>
         </div>
       </div>
+
+      <!-- Mode info -->
+      <p class="mt-6 text-gray-500 text-sm">
+        ✨ Click buttons to add things • 🌈 Change the sky • 🐱 Add creatures
+      </p>
     </div>
   </div>
 

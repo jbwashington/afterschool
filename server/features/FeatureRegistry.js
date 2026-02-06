@@ -28,6 +28,22 @@ export class FeatureRegistry {
       f => !gameState.appliedFeatureIds.includes(f.id)
     )
 
+    // If world is empty, prioritize starter cards (ground types)
+    const worldIsEmpty = gameState.entityCount === 0
+    if (worldIsEmpty) {
+      const starterCards = unusedFeatures.filter(f => f.starter === true)
+      if (starterCards.length > 0) {
+        // Return all available starter cards so kids can choose their ground
+        return starterCards.slice(0, 4).map(f => ({
+          id: f.id,
+          name: f.name,
+          description: f.description,
+          category: f.category,
+          icon: f.icon,
+        }))
+      }
+    }
+
     // Select cards based on turn progression
     const cardCount = Math.min(4, Math.max(2, unusedFeatures.length))
 
@@ -37,16 +53,17 @@ export class FeatureRegistry {
 
     for (let i = 0; i < cardCount; i++) {
       const preferredCategory = categories[i % categories.length]
+      // Exclude starter cards from normal rotation (they're for empty worlds)
       const candidates = unusedFeatures.filter(
-        f => f.category === preferredCategory && !selectedIds.has(f.id)
+        f => f.category === preferredCategory && !selectedIds.has(f.id) && !f.starter
       )
 
       let selected
       if (candidates.length > 0) {
         selected = candidates[Math.floor(Math.random() * candidates.length)]
       } else {
-        // Fallback to any unused feature
-        const fallback = unusedFeatures.filter(f => !selectedIds.has(f.id))
+        // Fallback to any unused non-starter feature
+        const fallback = unusedFeatures.filter(f => !selectedIds.has(f.id) && !f.starter)
         if (fallback.length > 0) {
           selected = fallback[Math.floor(Math.random() * fallback.length)]
         }

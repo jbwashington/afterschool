@@ -10,10 +10,8 @@ describe('GameState', () => {
   })
 
   describe('initialization', () => {
-    it('should create default world with ground plane', () => {
-      expect(gameState.entityCount).toBe(1)
-      const entities = Array.from(gameState.entities.values())
-      expect(entities[0].type).toBe(ENTITY_TYPES.GROUND)
+    it('should start with empty world for kids to build', () => {
+      expect(gameState.entityCount).toBe(0)
     })
 
     it('should have empty rules initially', () => {
@@ -27,7 +25,7 @@ describe('GameState', () => {
 
   describe('entity management', () => {
     it('should spawn entities up to the limit', () => {
-      for (let i = 0; i < GAME.MAX_ENTITIES - 1; i++) {
+      for (let i = 0; i < GAME.MAX_ENTITIES; i++) {
         const entity = gameState.spawnEntity({
           type: ENTITY_TYPES.DECORATION,
           position: { x: i, y: 0, z: 0 },
@@ -39,7 +37,7 @@ describe('GameState', () => {
 
     it('should not spawn beyond entity limit', () => {
       // Fill up to limit
-      for (let i = 0; i < GAME.MAX_ENTITIES - 1; i++) {
+      for (let i = 0; i < GAME.MAX_ENTITIES; i++) {
         gameState.spawnEntity({ type: ENTITY_TYPES.DECORATION })
       }
 
@@ -51,11 +49,11 @@ describe('GameState', () => {
 
     it('should remove entities correctly', () => {
       const entity = gameState.spawnEntity({ type: ENTITY_TYPES.TREE })
-      expect(gameState.entityCount).toBe(2) // ground + tree
+      expect(gameState.entityCount).toBe(1)
 
       const removed = gameState.removeEntity(entity.id)
       expect(removed).toBe(true)
-      expect(gameState.entityCount).toBe(1)
+      expect(gameState.entityCount).toBe(0)
     })
 
     it('should update entity properties', () => {
@@ -82,7 +80,7 @@ describe('GameState', () => {
 
       const results = gameState.applyFeature(feature)
       expect(results).toHaveLength(2)
-      expect(gameState.entityCount).toBe(3) // ground + 2 trees
+      expect(gameState.entityCount).toBe(2)
       expect(gameState.appliedFeatureIds).toContain('test_feature')
     })
 
@@ -105,9 +103,9 @@ describe('GameState', () => {
       gameState.spawnEntity({ type: ENTITY_TYPES.BUILDING, color: 0x123456 })
 
       const serialized = gameState.serialize()
-      expect(serialized.entities).toHaveLength(2)
+      expect(serialized.entities).toHaveLength(1)
       expect(serialized.rules).toHaveLength(0)
-      expect(serialized.entityCount).toBe(2)
+      expect(serialized.entityCount).toBe(1)
     })
   })
 })

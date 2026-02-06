@@ -2,6 +2,7 @@ import './styles/main.css'
 import { Game } from './game/Game.js'
 import { NetworkClient } from './network/NetworkClient.js'
 import { UIManager } from './ui/UIManager.js'
+import { ControlPanel } from './ui/ControlPanel.js'
 import { AudioProcessor } from './audio/AudioProcessor.js'
 
 class App {
@@ -9,9 +10,11 @@ class App {
     this.game = null
     this.network = null
     this.ui = null
+    this.controlPanel = null
     this.audio = null
     this.roomId = null
     this.playerId = null
+    this.mode = 'sandbox' // 'sandbox' or 'turns'
   }
 
   async init() {
@@ -24,6 +27,7 @@ class App {
     // Check URL for room ID
     const urlParams = new URLSearchParams(window.location.search)
     const roomFromUrl = urlParams.get('room') || window.location.hash.slice(1)
+    this.mode = urlParams.get('mode') || 'sandbox'
 
     if (roomFromUrl) {
       this.joinRoom(roomFromUrl)
@@ -42,8 +46,8 @@ class App {
   async joinRoom(roomId) {
     this.roomId = roomId
 
-    // Update URL
-    window.history.replaceState({}, '', `?room=${roomId}`)
+    // Update URL with mode
+    window.history.replaceState({}, '', `?room=${roomId}&mode=${this.mode}`)
 
     // Hide join modal
     this.ui.hideJoinModal()
@@ -54,8 +58,15 @@ class App {
     this.game = new Game(container)
     await this.game.init()
 
+    // Initialize control panel for sandbox mode
+    if (this.mode === 'sandbox') {
+      this.controlPanel = new ControlPanel((action) => this.handleControlPanelAction(action))
+      const overlay = document.getElementById('ui-overlay')
+      this.controlPanel.mount(overlay)
+    }
+
     // Connect to server
-    const wsUrl = `ws://${window.location.hostname}:3001?room=${roomId}`
+    const wsUrl = `ws://${window.location.hostname}:3001?room=${roomId}&mode=${this.mode}`
     this.network = new NetworkClient(wsUrl)
 
     this.network.onConnected = (data) => this.handleConnected(data)
@@ -65,6 +76,9 @@ class App {
     this.network.onTurnEnd = (data) => this.handleTurnEnd(data)
     this.network.onCardSelected = (data) => this.handleCardSelected(data)
     this.network.onWorldUpdate = (data) => this.handleWorldUpdate(data)
+    this.network.onEntitySpawn = (data) => this.handleEntitySpawn(data)
+    this.network.onSkyChange = (data) => this.handleSkyChange(data)
+    this.network.onClearAll = () => this.handleClearAll()
     this.network.onError = (data) => this.handleError(data)
     this.network.onDisconnected = () => this.handleDisconnected()
 
@@ -73,6 +87,36 @@ class App {
     // Initialize audio processor
     this.audio = new AudioProcessor()
     this.audio.onSignal = (signal) => this.handleAudioSignal(signal)
+  }
+
+  handleControlPanelAction(action) {
+    // Apply locally for instant feedback
+    if (action.type === 'spawn') {
+      const entityData = {
+        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        ...action.entity
+      }
+      this.game.spawnEntity(entityData)
+
+      // Send to server for sync
+      this.network.send({
+        type: 'spawn_entity',
+        entity: entityData,
+      })
+    } else if (action.type === 'change_sky') {
+      this.game.changeSkyColor(action.color)
+
+      this.network.send({
+        type: 'change_sky',
+        color: action.color,
+      })
+    } else if (action.type === 'clear_all') {
+      this.game.clearAll()
+
+      this.network.send({
+        type: 'clear_all',
+      })
+    }
   }
 
   handleConnected(data) {
@@ -84,38 +128,52 @@ class App {
       this.game.loadWorld(data.gameState.world)
     }
 
-    if (data.gameState.playerCount < 2) {
-      this.ui.showStatus(
-        'Waiting for another player...',
-        `Share this link: ${window.location.href}`
-      )
-    } else if (data.gameState.phase !== 'waiting') {
-      // Game already in progress
-      this.handleTurnStart({
-        turn: data.gameState.turn,
-        phase: data.gameState.phase,
-        cards: data.gameState.availableCards,
-      })
+    // In sandbox mode, always show the control panel
+    if (this.mode === 'sandbox') {
+      this.ui.hideStatus()
+      this.controlPanel?.show()
+
+      // Start audio for sandbox mode too
+      this.audio.startListening()
+    } else {
+      // Turn-based mode
+      if (data.gameState.playerCount < 2) {
+        this.ui.showStatus(
+          'Waiting for another player...',
+          `Share this link: ${window.location.href}`
+        )
+      } else if (data.gameState.phase !== 'waiting') {
+        this.handleTurnStart({
+          turn: data.gameState.turn,
+          phase: data.gameState.phase,
+          cards: data.gameState.availableCards,
+        })
+      }
     }
   }
 
   handlePlayerJoined(data) {
     this.ui.updatePlayerCount(data.playerCount)
 
-    if (data.playerCount === 2) {
+    if (this.mode === 'turns' && data.playerCount === 2) {
       this.ui.hideStatus()
     }
   }
 
   handlePlayerLeft(data) {
     this.ui.updatePlayerCount(data.playerCount)
-    this.ui.showStatus(
-      'Player left the game',
-      'Waiting for another player to join...'
-    )
+
+    if (this.mode === 'turns') {
+      this.ui.showStatus(
+        'Player left the game',
+        'Waiting for another player to join...'
+      )
+    }
   }
 
   handleTurnStart(data) {
+    if (this.mode !== 'turns') return
+
     this.ui.hideStatus()
     this.ui.hideReflection()
 
@@ -123,18 +181,19 @@ class App {
     this.ui.updateTurnInfo(data.turn, data.phase, myRole)
     this.ui.showCards(data.cards, myRole)
 
-    // Start audio listening on turn start
     if (!this.audio.isListening) {
       this.audio.startListening()
     }
   }
 
   handleTurnEnd(data) {
+    if (this.mode !== 'turns') return
     this.ui.hideCards()
     this.ui.showReflection(data.prompt)
   }
 
   handleCardSelected(data) {
+    if (this.mode !== 'turns') return
     this.ui.markCardSelected(data.cardId, data.playerId === this.playerId)
 
     if (data.selectionsCount === 2) {
@@ -159,6 +218,24 @@ class App {
     }
   }
 
+  handleEntitySpawn(data) {
+    // Another player spawned an entity - add it to our world
+    if (data.playerId !== this.playerId) {
+      this.game.spawnEntity(data.entity)
+    }
+  }
+
+  handleSkyChange(data) {
+    // Another player changed the sky
+    if (data.playerId !== this.playerId) {
+      this.game.changeSkyColor(data.color)
+    }
+  }
+
+  handleClearAll() {
+    this.game.clearAll()
+  }
+
   handleError(data) {
     console.error('Server error:', data.message)
     this.ui.showStatus('Error', data.message)
@@ -166,7 +243,6 @@ class App {
 
   handleDisconnected() {
     this.ui.showStatus('Disconnected', 'Trying to reconnect...')
-    // Attempt reconnect after delay
     setTimeout(() => {
       if (this.roomId) {
         this.network.connect()
@@ -182,7 +258,6 @@ class App {
   }
 
   handleAudioSignal(signal) {
-    // Only send meaningful signals
     if (signal.peak > 0.3 || signal.volume > 0.2) {
       this.network.send({
         type: 'audio_signal',

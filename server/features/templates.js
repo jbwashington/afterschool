@@ -2,6 +2,80 @@ import { CARD_CATEGORIES, ENTITY_TYPES } from '../../shared/constants.js'
 
 // Feature templates - bounded, pre-approved actions
 export const featureTemplates = [
+  // STARTER cards - basic world building blocks
+  {
+    id: 'grass_ground',
+    name: 'Create Grass Field',
+    description: 'A big grassy field to build on!',
+    category: CARD_CATEGORIES.BUILD,
+    icon: '🌿',
+    starter: true,
+    spawn: [
+      {
+        type: ENTITY_TYPES.GROUND,
+        mesh: 'ground',
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 20, y: 0.1, z: 20 },
+        color: 0x7ec850,
+      },
+    ],
+    constraints: { maxCount: 1 },
+  },
+  {
+    id: 'sand_ground',
+    name: 'Create Sandy Beach',
+    description: 'A warm sandy area for the town!',
+    category: CARD_CATEGORIES.BUILD,
+    icon: '🏖️',
+    starter: true,
+    spawn: [
+      {
+        type: ENTITY_TYPES.GROUND,
+        mesh: 'ground',
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 20, y: 0.1, z: 20 },
+        color: 0xf4d03f,
+      },
+    ],
+    constraints: { maxCount: 1 },
+  },
+  {
+    id: 'snow_ground',
+    name: 'Create Snowy Land',
+    description: 'A magical snowy wonderland!',
+    category: CARD_CATEGORIES.BUILD,
+    icon: '❄️',
+    starter: true,
+    spawn: [
+      {
+        type: ENTITY_TYPES.GROUND,
+        mesh: 'ground',
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 20, y: 0.1, z: 20 },
+        color: 0xf0f8ff,
+      },
+    ],
+    constraints: { maxCount: 1 },
+  },
+  {
+    id: 'stone_ground',
+    name: 'Create Stone Plaza',
+    description: 'A solid stone foundation!',
+    category: CARD_CATEGORIES.BUILD,
+    icon: '🪨',
+    starter: true,
+    spawn: [
+      {
+        type: ENTITY_TYPES.GROUND,
+        mesh: 'ground',
+        position: { x: 0, y: 0, z: 0 },
+        scale: { x: 20, y: 0.1, z: 20 },
+        color: 0x808080,
+      },
+    ],
+    constraints: { maxCount: 1 },
+  },
+
   // BUILD category
   {
     id: 'playground',

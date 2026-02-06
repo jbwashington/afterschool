@@ -265,4 +265,14 @@ export class Game {
     this.scene.background.setHex(color)
     this.scene.fog.color.setHex(color)
   }
+
+  clearAll() {
+    // Remove all entities except keep the scene
+    for (const [id, entity] of this.entities) {
+      this.scene.remove(entity.mesh)
+      this.animationManager.unregister(id)
+    }
+    this.entities.clear()
+    console.log('[game] Cleared all entities')
+  }
 }

@@ -49,6 +49,13 @@ export const MESSAGE_TYPES = {
   ENTITY_SPAWN: 'entity_spawn',
   ENTITY_REMOVE: 'entity_remove',
 
+  // Sandbox mode
+  SPAWN_ENTITY: 'spawn_entity',
+  ENTITY_SPAWN: 'entity_spawn',
+  CHANGE_SKY: 'change_sky',
+  SKY_CHANGE: 'sky_change',
+  CLEAR_ALL: 'clear_all',
+
   // Errors
   ERROR: 'error',
 }

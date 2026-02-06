@@ -80,6 +80,34 @@ function handleMessage(roomId, player, message) {
       room.handleAudioSignal(player.id, message.signal)
       break
 
+    // Sandbox mode messages
+    case 'spawn_entity':
+      // Add to game state and broadcast to others
+      room.gameState.spawnEntity(message.entity)
+      room.broadcast({
+        type: 'entity_spawn',
+        playerId: player.id,
+        entity: message.entity,
+      }, player.ws)
+      break
+
+    case 'change_sky':
+      room.broadcast({
+        type: 'sky_change',
+        playerId: player.id,
+        color: message.color,
+      }, player.ws)
+      break
+
+    case 'clear_all':
+      // Clear game state
+      room.gameState.entities.clear()
+      room.gameState.appliedFeatureIds = []
+      room.broadcast({
+        type: 'clear_all',
+      })
+      break
+
     default:
       console.log(`[message] Unknown type: ${message.type}`)
   }
