@@ -15,6 +15,7 @@ export class NetworkClient {
     this.onWorldUpdate = null
     this.onEntitySpawn = null
     this.onSkyChange = null
+    this.onGroundChange = null
     this.onClearAll = null
     this.onError = null
     this.onDisconnected = null
@@ -113,6 +114,10 @@ export class NetworkClient {
 
       case 'sky_change':
         if (this.onSkyChange) this.onSkyChange(message)
+        break
+
+      case 'ground_change':
+        if (this.onGroundChange) this.onGroundChange(message)
         break
 
       case 'clear_all':

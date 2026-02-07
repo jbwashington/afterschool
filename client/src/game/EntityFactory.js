@@ -5,6 +5,7 @@ export class EntityFactory {
     this.scene = scene
     this.meshGenerators = {
       box: this.createBox.bind(this),
+      ground: this.createGround.bind(this),
       house: this.createHouse.bind(this),
       tree: this.createTree.bind(this),
       tower: this.createTower.bind(this),
@@ -45,6 +46,14 @@ export class EntityFactory {
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshLambertMaterial({ color: data.color || 0xffffff })
     return new THREE.Mesh(geometry, material)
+  }
+
+  createGround(data) {
+    const geometry = new THREE.PlaneGeometry(1, 1)
+    const material = new THREE.MeshLambertMaterial({ color: data.color || 0x7ec850 })
+    const ground = new THREE.Mesh(geometry, material)
+    ground.rotation.x = -Math.PI / 2
+    return ground
   }
 
   createHouse(data) {

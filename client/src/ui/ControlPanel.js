@@ -1,11 +1,17 @@
 // Control Panel for live building - kids see changes instantly!
 export class ControlPanel {
-  constructor(onAction) {
+  constructor(onAction, onDragStart, onDragEnd) {
     this.onAction = onAction
+    this.onDragStart = onDragStart || (() => {})
+    this.onDragEnd = onDragEnd || (() => {})
     this.container = null
+    this.dragGhost = null
+    this.currentDragItem = null
+    this.currentDragCategory = null
     this.categories = {
       ground: {
         label: '🌍 Ground',
+        draggable: false,
         items: [
           { id: 'grass', name: 'Grass', icon: '🌿', color: 0x7ec850 },
           { id: 'sand', name: 'Sand', icon: '🏖️', color: 0xf4d03f },
@@ -15,6 +21,7 @@ export class ControlPanel {
       },
       buildings: {
         label: '🏠 Buildings',
+        draggable: true,
         items: [
           { id: 'house', name: 'House', icon: '🏠', mesh: 'house' },
           { id: 'tower', name: 'Tower', icon: '🗼', mesh: 'tower' },
@@ -23,6 +30,7 @@ export class ControlPanel {
       },
       nature: {
         label: '🌳 Nature',
+        draggable: true,
         items: [
           { id: 'tree', name: 'Tree', icon: '🌳', mesh: 'tree', color: 0x2d5a27 },
           { id: 'flowers', name: 'Flowers', icon: '🌸', mesh: 'flowers' },
@@ -31,6 +39,7 @@ export class ControlPanel {
       },
       creatures: {
         label: '🐱 Creatures',
+        draggable: true,
         items: [
           { id: 'robot_cat', name: 'Robot Cat', icon: '🐱', mesh: 'robot_cat', animation: { type: 'wander', speed: 0.5, radius: 5 } },
           { id: 'butterflies', name: 'Butterflies', icon: '🦋', mesh: 'butterfly', animation: { type: 'flutter', height: 2 } },
@@ -38,6 +47,7 @@ export class ControlPanel {
       },
       decorations: {
         label: '✨ Decorations',
+        draggable: true,
         items: [
           { id: 'lamp', name: 'Street Lamp', icon: '💡', mesh: 'lamp' },
           { id: 'rainbow', name: 'Rainbow', icon: '🌈', mesh: 'rainbow' },
@@ -45,6 +55,7 @@ export class ControlPanel {
       },
       sky: {
         label: '🌈 Sky',
+        draggable: false,
         items: [
           { id: 'sky_blue', name: 'Day', icon: '☀️', skyColor: 0x87ceeb },
           { id: 'sky_sunset', name: 'Sunset', icon: '🌅', skyColor: 0xffb347 },
@@ -54,6 +65,7 @@ export class ControlPanel {
       },
     }
     this.build()
+    this.setupDragListeners()
   }
 
   build() {
@@ -61,7 +73,8 @@ export class ControlPanel {
     this.container.id = 'control-panel'
     this.container.className = 'fixed left-4 top-1/2 -translate-y-1/2 bg-black/80 rounded-2xl p-4 max-h-[80vh] overflow-y-auto pointer-events-auto'
     this.container.innerHTML = `
-      <h2 class="text-lg font-bold mb-4 text-center">🛠️ Build</h2>
+      <h2 class="text-lg font-bold mb-2 text-center">🛠️ Build</h2>
+      <p class="text-xs text-gray-400 text-center mb-4">Drag items onto the world!</p>
       <div id="panel-categories" class="space-y-4"></div>
     `
 
@@ -80,12 +93,28 @@ export class ControlPanel {
       for (const item of category.items) {
         const btn = document.createElement('button')
         btn.className = 'panel-btn flex flex-col items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all hover:scale-105 active:scale-95'
+        if (category.draggable) {
+          btn.className += ' cursor-grab active:cursor-grabbing'
+          btn.draggable = true
+        }
         btn.dataset.itemId = item.id
+        btn.dataset.category = key
         btn.innerHTML = `
           <span class="text-2xl">${item.icon}</span>
           <span class="text-xs mt-1 text-gray-300">${item.name}</span>
         `
-        btn.addEventListener('click', () => this.handleClick(key, item))
+
+        // Click for non-draggable items (ground, sky)
+        if (!category.draggable) {
+          btn.addEventListener('click', () => this.handleClick(key, item))
+        }
+
+        // Drag events for draggable items
+        if (category.draggable) {
+          btn.addEventListener('dragstart', (e) => this.handleDragStart(e, key, item))
+          btn.addEventListener('dragend', (e) => this.handleDragEnd(e))
+        }
+
         itemsGrid.appendChild(btn)
       }
 
@@ -98,42 +127,88 @@ export class ControlPanel {
     clearBtn.textContent = '🗑️ Clear All'
     clearBtn.addEventListener('click', () => this.onAction({ type: 'clear_all' }))
     categoriesContainer.appendChild(clearBtn)
+
+    // Create drag ghost element
+    this.dragGhost = document.createElement('div')
+    this.dragGhost.id = 'drag-ghost'
+    this.dragGhost.className = 'fixed pointer-events-none z-50 text-4xl hidden'
+    document.body.appendChild(this.dragGhost)
+  }
+
+  setupDragListeners() {
+    // Track mouse position for custom drag ghost
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      if (this.dragGhost && this.currentDragItem) {
+        this.dragGhost.style.left = `${e.clientX - 20}px`
+        this.dragGhost.style.top = `${e.clientY - 20}px`
+      }
+    })
+  }
+
+  handleDragStart(e, category, item) {
+    this.currentDragItem = item
+    this.currentDragCategory = category
+
+    // Set drag data
+    e.dataTransfer.setData('application/json', JSON.stringify({ category, item }))
+    e.dataTransfer.effectAllowed = 'copy'
+
+    // Use transparent image for native drag
+    const img = new Image()
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    e.dataTransfer.setDragImage(img, 0, 0)
+
+    // Show custom ghost
+    this.dragGhost.textContent = item.icon
+    this.dragGhost.classList.remove('hidden')
+    this.dragGhost.style.left = `${e.clientX - 20}px`
+    this.dragGhost.style.top = `${e.clientY - 20}px`
+
+    this.onDragStart(item)
+  }
+
+  handleDragEnd(e) {
+    this.dragGhost.classList.add('hidden')
+    this.onDragEnd()
+    this.currentDragItem = null
+    this.currentDragCategory = null
   }
 
   handleClick(category, item) {
-    // Generate random position within bounds
-    const x = (Math.random() - 0.5) * 16
-    const z = (Math.random() - 0.5) * 16
-
     if (category === 'ground') {
       this.onAction({
-        type: 'spawn',
-        entity: {
-          type: 'ground',
-          mesh: 'ground',
-          position: { x: 0, y: 0, z: 0 },
-          scale: { x: 20, y: 0.1, z: 20 },
-          color: item.color,
-        }
+        type: 'change_ground',
+        color: item.color,
       })
     } else if (category === 'sky') {
       this.onAction({
         type: 'change_sky',
         color: item.skyColor,
       })
-    } else {
-      this.onAction({
-        type: 'spawn',
-        entity: {
-          type: item.id,
-          mesh: item.mesh || item.id,
-          position: { x, y: 0, z },
-          scale: { x: 1, y: 1, z: 1 },
-          color: item.color || 0xffffff,
-          animation: item.animation || null,
-        }
-      })
     }
+  }
+
+  // Called when item is dropped on canvas with position
+  spawnAtPosition(x, z) {
+    if (!this.currentDragItem) return
+
+    const item = this.currentDragItem
+    this.onAction({
+      type: 'spawn',
+      entity: {
+        type: item.id,
+        mesh: item.mesh || item.id,
+        position: { x, y: 0, z },
+        scale: { x: 1, y: 1, z: 1 },
+        color: item.color || 0xffffff,
+        animation: item.animation || null,
+      }
+    })
+  }
+
+  getCurrentDragItem() {
+    return this.currentDragItem
   }
 
   mount(parent) {
@@ -142,6 +217,7 @@ export class ControlPanel {
 
   unmount() {
     this.container?.remove()
+    this.dragGhost?.remove()
   }
 
   show() {

@@ -3,6 +3,7 @@ import { Game } from './game/Game.js'
 import { NetworkClient } from './network/NetworkClient.js'
 import { UIManager } from './ui/UIManager.js'
 import { ControlPanel } from './ui/ControlPanel.js'
+import { CameraControls } from './ui/CameraControls.js'
 import { AudioProcessor } from './audio/AudioProcessor.js'
 
 class App {
@@ -11,6 +12,7 @@ class App {
     this.network = null
     this.ui = null
     this.controlPanel = null
+    this.cameraControls = null
     this.audio = null
     this.roomId = null
     this.playerId = null
@@ -58,11 +60,22 @@ class App {
     this.game = new Game(container)
     await this.game.init()
 
+    // Initialize camera controls
+    this.cameraControls = new CameraControls(this.game)
+    const overlay = document.getElementById('ui-overlay')
+    this.cameraControls.mount(overlay)
+
     // Initialize control panel for sandbox mode
     if (this.mode === 'sandbox') {
-      this.controlPanel = new ControlPanel((action) => this.handleControlPanelAction(action))
-      const overlay = document.getElementById('ui-overlay')
+      this.controlPanel = new ControlPanel(
+        (action) => this.handleControlPanelAction(action),
+        () => this.game.setControlsEnabled(false), // Disable orbit during drag
+        () => this.game.setControlsEnabled(true)   // Re-enable after drag
+      )
       this.controlPanel.mount(overlay)
+
+      // Setup drop zone on the canvas
+      this.setupDropZone(container)
     }
 
     // Connect to server
@@ -78,6 +91,7 @@ class App {
     this.network.onWorldUpdate = (data) => this.handleWorldUpdate(data)
     this.network.onEntitySpawn = (data) => this.handleEntitySpawn(data)
     this.network.onSkyChange = (data) => this.handleSkyChange(data)
+    this.network.onGroundChange = (data) => this.handleGroundChange(data)
     this.network.onClearAll = () => this.handleClearAll()
     this.network.onError = (data) => this.handleError(data)
     this.network.onDisconnected = () => this.handleDisconnected()
@@ -108,6 +122,13 @@ class App {
 
       this.network.send({
         type: 'change_sky',
+        color: action.color,
+      })
+    } else if (action.type === 'change_ground') {
+      this.game.changeGroundColor(action.color)
+
+      this.network.send({
+        type: 'change_ground',
         color: action.color,
       })
     } else if (action.type === 'clear_all') {
@@ -232,6 +253,13 @@ class App {
     }
   }
 
+  handleGroundChange(data) {
+    // Another player changed the ground
+    if (data.playerId !== this.playerId) {
+      this.game.changeGroundColor(data.color)
+    }
+  }
+
   handleClearAll() {
     this.game.clearAll()
   }
@@ -264,6 +292,23 @@ class App {
         signal,
       })
     }
+  }
+
+  setupDropZone(container) {
+    container.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'copy'
+    })
+
+    container.addEventListener('drop', (e) => {
+      e.preventDefault()
+
+      // Get world position from screen coordinates
+      const worldPos = this.game.screenToWorld(e.clientX, e.clientY)
+      if (worldPos && this.controlPanel) {
+        this.controlPanel.spawnAtPosition(worldPos.x, worldPos.z)
+      }
+    })
   }
 }
 

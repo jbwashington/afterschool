@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { EntityFactory } from './EntityFactory.js'
 import { AnimationManager } from './AnimationManager.js'
 
@@ -8,6 +9,7 @@ export class Game {
     this.scene = null
     this.camera = null
     this.renderer = null
+    this.controls = null
     this.entities = new Map()
     this.entityFactory = null
     this.animationManager = null
@@ -18,7 +20,9 @@ export class Game {
     this.setupScene()
     this.setupCamera()
     this.setupRenderer()
+    this.setupControls()
     this.setupLights()
+    this.setupGround()
     this.entityFactory = new EntityFactory(this.scene)
     this.animationManager = new AnimationManager()
 
@@ -53,6 +57,16 @@ export class Game {
     this.container.appendChild(this.renderer.domElement)
   }
 
+  setupControls() {
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+    this.controls.enableDamping = true
+    this.controls.dampingFactor = 0.1
+    this.controls.maxPolarAngle = Math.PI / 2.1 // Prevent going below ground
+    this.controls.minDistance = 5
+    this.controls.maxDistance = 50
+    this.controls.target.set(0, 0, 0)
+  }
+
   setupLights() {
     // Ambient light
     const ambient = new THREE.AmbientLight(0xffffff, 0.6)
@@ -68,6 +82,21 @@ export class Game {
     this.scene.add(hemi)
   }
 
+  setupGround() {
+    // Create ground plane
+    const groundGeometry = new THREE.PlaneGeometry(40, 40)
+    const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x7ec850 })
+    this.ground = new THREE.Mesh(groundGeometry, groundMaterial)
+    this.ground.rotation.x = -Math.PI / 2
+    this.ground.position.y = 0
+    this.scene.add(this.ground)
+
+    // Add grid helper for visual reference
+    const gridHelper = new THREE.GridHelper(40, 20, 0x5a9a40, 0x5a9a40)
+    gridHelper.position.y = 0.01
+    this.scene.add(gridHelper)
+  }
+
   handleResize() {
     const width = this.container.clientWidth
     const height = this.container.clientHeight
@@ -81,6 +110,9 @@ export class Game {
     requestAnimationFrame(() => this.animate())
 
     const delta = this.clock.getDelta()
+
+    // Update controls
+    this.controls.update()
 
     // Update animations
     this.animationManager.update(delta, this.entities)
@@ -266,6 +298,12 @@ export class Game {
     this.scene.fog.color.setHex(color)
   }
 
+  changeGroundColor(color) {
+    if (this.ground) {
+      this.ground.material.color.setHex(color)
+    }
+  }
+
   clearAll() {
     // Remove all entities except keep the scene
     for (const [id, entity] of this.entities) {
@@ -274,5 +312,100 @@ export class Game {
     }
     this.entities.clear()
     console.log('[game] Cleared all entities')
+  }
+
+  fitAll() {
+    if (this.entities.size === 0) {
+      this.resetView()
+      return
+    }
+
+    // Calculate bounding box of all entities
+    const box = new THREE.Box3()
+    for (const entity of this.entities.values()) {
+      box.expandByObject(entity.mesh)
+    }
+
+    const center = box.getCenter(new THREE.Vector3())
+    const size = box.getSize(new THREE.Vector3())
+    const maxDim = Math.max(size.x, size.y, size.z)
+    const fov = this.camera.fov * (Math.PI / 180)
+    let cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 0.8
+
+    // Ensure minimum distance
+    cameraDistance = Math.max(cameraDistance, 10)
+
+    // Animate to new position
+    const targetPosition = new THREE.Vector3(
+      center.x + cameraDistance * 0.5,
+      center.y + cameraDistance * 0.5,
+      center.z + cameraDistance * 0.5
+    )
+
+    this.animateCameraTo(targetPosition, center)
+  }
+
+  resetView() {
+    const targetPosition = new THREE.Vector3(0, 10, 15)
+    const targetLookAt = new THREE.Vector3(0, 0, 0)
+    this.animateCameraTo(targetPosition, targetLookAt)
+  }
+
+  animateCameraTo(targetPosition, targetLookAt) {
+    const startPosition = this.camera.position.clone()
+    const startTarget = this.controls.target.clone()
+    const duration = 0.5
+    let elapsed = 0
+
+    const animate = () => {
+      elapsed += this.clock.getDelta()
+      const t = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3) // Ease out cubic
+
+      this.camera.position.lerpVectors(startPosition, targetPosition, eased)
+      this.controls.target.lerpVectors(startTarget, targetLookAt, eased)
+
+      if (t < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+    animate()
+  }
+
+  zoomIn() {
+    const direction = new THREE.Vector3()
+    direction.subVectors(this.controls.target, this.camera.position).normalize()
+    this.camera.position.addScaledVector(direction, 2)
+  }
+
+  zoomOut() {
+    const direction = new THREE.Vector3()
+    direction.subVectors(this.controls.target, this.camera.position).normalize()
+    this.camera.position.addScaledVector(direction, -2)
+  }
+
+  // Convert screen coordinates to world position on ground plane
+  screenToWorld(screenX, screenY) {
+    const rect = this.container.getBoundingClientRect()
+    const x = ((screenX - rect.left) / rect.width) * 2 - 1
+    const y = -((screenY - rect.top) / rect.height) * 2 + 1
+
+    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(new THREE.Vector2(x, y), this.camera)
+
+    // Intersect with ground plane (y = 0)
+    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+    const intersection = new THREE.Vector3()
+    raycaster.ray.intersectPlane(groundPlane, intersection)
+
+    if (intersection) {
+      return { x: intersection.x, z: intersection.z }
+    }
+    return null
+  }
+
+  // Enable/disable orbit controls (useful during drag)
+  setControlsEnabled(enabled) {
+    this.controls.enabled = enabled
   }
 }

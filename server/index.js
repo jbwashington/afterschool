@@ -99,6 +99,14 @@ function handleMessage(roomId, player, message) {
       }, player.ws)
       break
 
+    case 'change_ground':
+      room.broadcast({
+        type: 'ground_change',
+        playerId: player.id,
+        color: message.color,
+      }, player.ws)
+      break
+
     case 'clear_all':
       // Clear game state
       room.gameState.entities.clear()
