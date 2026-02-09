@@ -1,39 +1,109 @@
 import './styles/main.css'
-import { Game } from './game/Game.js'
+import { Desktop } from './os/Desktop.js'
+import { Taskbar } from './os/Taskbar.js'
+import { StartMenu } from './os/StartMenu.js'
+import { WindowManager } from './os/WindowManager.js'
+import { AppRegistry } from './apps/AppRegistry.js'
+import { NotepadApp } from './apps/notepad/Notepad.js'
+import { WinampApp } from './apps/winamp/Winamp.js'
+import { KidsOnlyPortalApp } from './apps/kids-portal/KidsOnlyPortal.js'
+import { MyComputerApp, MyDocumentsApp, RecycleBinApp } from './apps/system/SystemApps.js'
+import { VirtualFileSystem } from './filesystem/VirtualFileSystem.js'
 import { NetworkClient } from './network/NetworkClient.js'
-import { UIManager } from './ui/UIManager.js'
-import { ControlPanel } from './ui/ControlPanel.js'
-import { CameraControls } from './ui/CameraControls.js'
-import { AudioProcessor } from './audio/AudioProcessor.js'
+import { CursorSync } from './multiplayer/CursorSync.js'
+import { RemoteCursorManager } from './multiplayer/RemoteCursor.js'
+import { MESSAGE_TYPES } from '../../shared/constants.js'
 
-class App {
+class SixSevenOS {
   constructor() {
-    this.game = null
+    this.desktop = null
+    this.taskbar = null
+    this.startMenu = null
+    this.windowManager = null
+    this.appRegistry = null
+    this.fileSystem = null
     this.network = null
-    this.ui = null
-    this.controlPanel = null
-    this.cameraControls = null
-    this.audio = null
-    this.roomId = null
+    this.cursorSync = null
+    this.remoteCursors = null
     this.playerId = null
-    this.mode = 'sandbox' // 'sandbox' or 'turns'
+    this.playerNumber = null
+    this.roomId = null
   }
 
   async init() {
-    // Initialize UI
-    this.ui = new UIManager()
-    this.ui.onCreateRoom = () => this.createRoom()
-    this.ui.onJoinRoom = (code) => this.joinRoom(code)
-    this.ui.onSelectCard = (cardId) => this.selectCard(cardId)
+    // Get container
+    const container = document.getElementById('os-container')
+    if (!container) {
+      console.error('OS container not found')
+      return
+    }
+
+    // Initialize file system
+    this.fileSystem = new VirtualFileSystem()
+    this.fileSystem.init()
+
+    // Initialize app registry
+    this.appRegistry = new AppRegistry()
+    this.registerApps()
+
+    // Initialize desktop
+    this.desktop = new Desktop(container, null)
+    this.desktop.init()
+
+    // Initialize taskbar
+    this.taskbar = new Taskbar(null, () => this.toggleStartMenu())
+    this.taskbar.init()
+
+    // Initialize window manager
+    this.windowManager = new WindowManager(this.desktop, this.taskbar, this.appRegistry)
+
+    // Wire up components
+    this.desktop.windowManager = this.windowManager
+    this.taskbar.windowManager = this.windowManager
+
+    // Initialize start menu
+    this.startMenu = new StartMenu(this.windowManager, 'User')
+    this.startMenu.init()
+
+    // Initialize remote cursors
+    this.remoteCursors = new RemoteCursorManager()
 
     // Check URL for room ID
     const urlParams = new URLSearchParams(window.location.search)
     const roomFromUrl = urlParams.get('room') || window.location.hash.slice(1)
-    this.mode = urlParams.get('mode') || 'sandbox'
 
     if (roomFromUrl) {
       this.joinRoom(roomFromUrl)
+    } else {
+      // Auto-create a room
+      this.createRoom()
     }
+
+    // Close start menu when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      if (this.startMenu.isOpen && !e.target.closest('.xp-start-menu') && !e.target.closest('.xp-start-button')) {
+        this.startMenu.close()
+      }
+    })
+
+    console.log('sixsevenOS initialized')
+  }
+
+  registerApps() {
+    this.appRegistry.register('notepad', NotepadApp)
+    this.appRegistry.register('winamp', WinampApp)
+    this.appRegistry.register('kids_portal', KidsOnlyPortalApp)
+    this.appRegistry.register('my_computer', MyComputerApp)
+    this.appRegistry.register('my_documents', MyDocumentsApp)
+    this.appRegistry.register('recycle_bin', RecycleBinApp)
+  }
+
+  toggleStartMenu() {
+    this.startMenu.toggle()
+  }
+
+  generateRoomId() {
+    return Math.random().toString(36).substring(2, 8).toUpperCase()
   }
 
   createRoom() {
@@ -41,277 +111,115 @@ class App {
     this.joinRoom(roomId)
   }
 
-  generateRoomId() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase()
-  }
-
-  async joinRoom(roomId) {
+  joinRoom(roomId) {
     this.roomId = roomId
-
-    // Update URL with mode
-    window.history.replaceState({}, '', `?room=${roomId}&mode=${this.mode}`)
-
-    // Hide join modal
-    this.ui.hideJoinModal()
-    this.ui.showStatus('Connecting...', `Room: ${roomId}`)
-
-    // Initialize game world
-    const container = document.getElementById('three-canvas')
-    this.game = new Game(container)
-    await this.game.init()
-
-    // Initialize camera controls
-    this.cameraControls = new CameraControls(this.game)
-    const overlay = document.getElementById('ui-overlay')
-    this.cameraControls.mount(overlay)
-
-    // Initialize control panel for sandbox mode
-    if (this.mode === 'sandbox') {
-      this.controlPanel = new ControlPanel(
-        (action) => this.handleControlPanelAction(action),
-        () => this.game.setControlsEnabled(false), // Disable orbit during drag
-        () => this.game.setControlsEnabled(true)   // Re-enable after drag
-      )
-      this.controlPanel.mount(overlay)
-
-      // Setup drop zone on the canvas
-      this.setupDropZone(container)
-    }
+    window.history.replaceState({}, '', `?room=${roomId}`)
 
     // Connect to server
-    const wsUrl = `ws://${window.location.hostname}:6767?room=${roomId}&mode=${this.mode}`
+    const wsUrl = `ws://${window.location.hostname}:6767?room=${roomId}`
     this.network = new NetworkClient(wsUrl)
 
+    // Set up network handlers
     this.network.onConnected = (data) => this.handleConnected(data)
     this.network.onPlayerJoined = (data) => this.handlePlayerJoined(data)
     this.network.onPlayerLeft = (data) => this.handlePlayerLeft(data)
-    this.network.onTurnStart = (data) => this.handleTurnStart(data)
-    this.network.onTurnEnd = (data) => this.handleTurnEnd(data)
-    this.network.onCardSelected = (data) => this.handleCardSelected(data)
-    this.network.onWorldUpdate = (data) => this.handleWorldUpdate(data)
-    this.network.onEntitySpawn = (data) => this.handleEntitySpawn(data)
-    this.network.onSkyChange = (data) => this.handleSkyChange(data)
-    this.network.onGroundChange = (data) => this.handleGroundChange(data)
-    this.network.onClearAll = () => this.handleClearAll()
+    this.network.onCursorMove = (data) => this.handleCursorMove(data)
+    this.network.onCursorDown = (data) => this.handleCursorDown(data)
+    this.network.onCursorUp = (data) => this.handleCursorUp(data)
     this.network.onError = (data) => this.handleError(data)
     this.network.onDisconnected = () => this.handleDisconnected()
 
     this.network.connect()
-
-    // Initialize audio processor
-    this.audio = new AudioProcessor()
-    this.audio.onSignal = (signal) => this.handleAudioSignal(signal)
-  }
-
-  handleControlPanelAction(action) {
-    // Apply locally for instant feedback
-    if (action.type === 'spawn') {
-      const entityData = {
-        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        ...action.entity
-      }
-      this.game.spawnEntity(entityData)
-
-      // Send to server for sync
-      this.network.send({
-        type: 'spawn_entity',
-        entity: entityData,
-      })
-    } else if (action.type === 'change_sky') {
-      this.game.changeSkyColor(action.color)
-
-      this.network.send({
-        type: 'change_sky',
-        color: action.color,
-      })
-    } else if (action.type === 'change_ground') {
-      this.game.changeGroundColor(action.color)
-
-      this.network.send({
-        type: 'change_ground',
-        color: action.color,
-      })
-    } else if (action.type === 'clear_all') {
-      this.game.clearAll()
-
-      this.network.send({
-        type: 'clear_all',
-      })
-    }
   }
 
   handleConnected(data) {
     this.playerId = data.playerId
-    this.ui.updatePlayerInfo(data.playerNumber, null, data.gameState.playerCount)
+    this.playerNumber = data.playerNumber
+    console.log(`[os] Connected as Player ${this.playerNumber}`)
 
-    // Load initial world state
-    if (data.gameState.world) {
-      this.game.loadWorld(data.gameState.world)
+    // Start cursor sync
+    this.cursorSync = new CursorSync(this.network, this.playerId)
+    this.cursorSync.start()
+
+    // Wire up window manager for multiplayer sync
+    this.windowManager.onWindowOpen = (windowId, appId, x, y) => {
+      this.network.send({
+        type: MESSAGE_TYPES.WINDOW_OPEN,
+        playerId: this.playerId,
+        windowId,
+        appId,
+        x,
+        y
+      })
     }
 
-    // In sandbox mode, always show the control panel
-    if (this.mode === 'sandbox') {
-      this.ui.hideStatus()
-      this.controlPanel?.show()
-
-      // Start audio for sandbox mode too
-      this.audio.startListening()
-    } else {
-      // Turn-based mode
-      if (data.gameState.playerCount < 2) {
-        this.ui.showStatus(
-          'Waiting for another player...',
-          `Share this link: ${window.location.href}`
-        )
-      } else if (data.gameState.phase !== 'waiting') {
-        this.handleTurnStart({
-          turn: data.gameState.turn,
-          phase: data.gameState.phase,
-          cards: data.gameState.availableCards,
-        })
-      }
+    this.windowManager.onWindowClose = (windowId) => {
+      this.network.send({
+        type: MESSAGE_TYPES.WINDOW_CLOSE,
+        playerId: this.playerId,
+        windowId
+      })
     }
+
+    this.windowManager.onWindowMove = (windowId, x, y) => {
+      this.network.send({
+        type: MESSAGE_TYPES.WINDOW_MOVE,
+        playerId: this.playerId,
+        windowId,
+        x,
+        y
+      })
+    }
+
+    // Show room code
+    console.log(`Share this link: ${window.location.href}`)
   }
 
   handlePlayerJoined(data) {
-    this.ui.updatePlayerCount(data.playerCount)
-
-    if (this.mode === 'turns' && data.playerCount === 2) {
-      this.ui.hideStatus()
-    }
+    console.log(`[os] Player ${data.playerNumber} joined`)
+    // Create a cursor for the new player
+    this.remoteCursors.addCursor(data.playerId, data.playerNumber, `Player ${data.playerNumber}`)
   }
 
   handlePlayerLeft(data) {
-    this.ui.updatePlayerCount(data.playerCount)
-
-    if (this.mode === 'turns') {
-      this.ui.showStatus(
-        'Player left the game',
-        'Waiting for another player to join...'
-      )
-    }
+    console.log(`[os] Player left`)
+    this.remoteCursors.removeCursor(data.playerId)
   }
 
-  handleTurnStart(data) {
-    if (this.mode !== 'turns') return
+  handleCursorMove(data) {
+    if (data.playerId === this.playerId) return
 
-    this.ui.hideStatus()
-    this.ui.hideReflection()
-
-    const myRole = data.roles?.[this.playerId]
-    this.ui.updateTurnInfo(data.turn, data.phase, myRole)
-    this.ui.showCards(data.cards, myRole)
-
-    if (!this.audio.isListening) {
-      this.audio.startListening()
+    // Add cursor if doesn't exist
+    if (!this.remoteCursors.getCursor(data.playerId)) {
+      this.remoteCursors.addCursor(data.playerId, data.playerNumber || 0, `Player`)
     }
+
+    this.remoteCursors.updateCursor(data.playerId, data.x, data.y)
   }
 
-  handleTurnEnd(data) {
-    if (this.mode !== 'turns') return
-    this.ui.hideCards()
-    this.ui.showReflection(data.prompt)
+  handleCursorDown(data) {
+    if (data.playerId === this.playerId) return
+    this.remoteCursors.setCursorClicking(data.playerId, true)
   }
 
-  handleCardSelected(data) {
-    if (this.mode !== 'turns') return
-    this.ui.markCardSelected(data.cardId, data.playerId === this.playerId)
-
-    if (data.selectionsCount === 2) {
-      this.ui.setCardsDisabled(true)
-      this.ui.setPhaseInstruction('Applying changes...')
-    }
-  }
-
-  handleWorldUpdate(data) {
-    if (data.features) {
-      for (const { feature } of data.features) {
-        this.game.applyFeature(feature)
-      }
-    }
-
-    if (data.worldState) {
-      this.game.syncWorld(data.worldState)
-    }
-
-    if (data.update) {
-      this.game.applyUpdate(data.update)
-    }
-  }
-
-  handleEntitySpawn(data) {
-    // Another player spawned an entity - add it to our world
-    if (data.playerId !== this.playerId) {
-      this.game.spawnEntity(data.entity)
-    }
-  }
-
-  handleSkyChange(data) {
-    // Another player changed the sky
-    if (data.playerId !== this.playerId) {
-      this.game.changeSkyColor(data.color)
-    }
-  }
-
-  handleGroundChange(data) {
-    // Another player changed the ground
-    if (data.playerId !== this.playerId) {
-      this.game.changeGroundColor(data.color)
-    }
-  }
-
-  handleClearAll() {
-    this.game.clearAll()
+  handleCursorUp(data) {
+    if (data.playerId === this.playerId) return
+    this.remoteCursors.setCursorClicking(data.playerId, false)
   }
 
   handleError(data) {
-    console.error('Server error:', data.message)
-    this.ui.showStatus('Error', data.message)
+    console.error('[os] Server error:', data.message)
   }
 
   handleDisconnected() {
-    this.ui.showStatus('Disconnected', 'Trying to reconnect...')
-    setTimeout(() => {
-      if (this.roomId) {
-        this.network.connect()
-      }
-    }, 3000)
-  }
-
-  selectCard(cardId) {
-    this.network.send({
-      type: 'select_card',
-      cardId,
-    })
-  }
-
-  handleAudioSignal(signal) {
-    if (signal.peak > 0.3 || signal.volume > 0.2) {
-      this.network.send({
-        type: 'audio_signal',
-        signal,
-      })
+    console.log('[os] Disconnected from server')
+    // Cursor sync will be restarted on reconnect
+    if (this.cursorSync) {
+      this.cursorSync.stop()
     }
-  }
-
-  setupDropZone(container) {
-    container.addEventListener('dragover', (e) => {
-      e.preventDefault()
-      e.dataTransfer.dropEffect = 'copy'
-    })
-
-    container.addEventListener('drop', (e) => {
-      e.preventDefault()
-
-      // Get world position from screen coordinates
-      const worldPos = this.game.screenToWorld(e.clientX, e.clientY)
-      if (worldPos && this.controlPanel) {
-        this.controlPanel.spawnAtPosition(worldPos.x, worldPos.z)
-      }
-    })
   }
 }
 
-// Start app
-const app = new App()
-app.init()
+// Start the OS
+const os = new SixSevenOS()
+os.init()

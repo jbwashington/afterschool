@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Room } from '../server/rooms/Room.js'
-import { GAME } from '../shared/constants.js'
+import { OS } from '../shared/constants.js'
 
 // Mock WebSocket
 const createMockWs = () => ({
@@ -25,29 +25,28 @@ describe('Room', () => {
       expect(room.playerCount).toBe(1)
     })
 
-    it('should add second player', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      room.addPlayer(ws1)
-      const player2 = room.addPlayer(ws2)
-
-      expect(player2).not.toBeNull()
-      expect(player2.number).toBe(2)
-      expect(room.playerCount).toBe(2)
+    it('should add multiple players up to max', () => {
+      const sockets = []
+      for (let i = 0; i < OS.MAX_PLAYERS; i++) {
+        const ws = createMockWs()
+        sockets.push(ws)
+        const player = room.addPlayer(ws)
+        expect(player).not.toBeNull()
+        expect(player.number).toBe(i + 1)
+      }
+      expect(room.playerCount).toBe(OS.MAX_PLAYERS)
     })
 
-    it('should reject third player', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-      const ws3 = createMockWs()
+    it('should reject player when room is full', () => {
+      // Fill the room
+      for (let i = 0; i < OS.MAX_PLAYERS; i++) {
+        room.addPlayer(createMockWs())
+      }
 
-      room.addPlayer(ws1)
-      room.addPlayer(ws2)
-      const player3 = room.addPlayer(ws3)
-
-      expect(player3).toBeNull()
-      expect(room.playerCount).toBe(2)
+      // Try to add one more
+      const extraPlayer = room.addPlayer(createMockWs())
+      expect(extraPlayer).toBeNull()
+      expect(room.playerCount).toBe(OS.MAX_PLAYERS)
     })
 
     it('should remove player correctly', () => {
@@ -57,132 +56,18 @@ describe('Room', () => {
       room.removePlayer(player.id)
       expect(room.playerCount).toBe(0)
     })
-  })
 
-  describe('game flow', () => {
-    it('should start game when 2 players join', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      expect(room.currentTurn).toBe(1)
-      expect(room.currentPhase).toBe('plan')
-    })
-
-    it('should generate cards at start of plan phase', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      expect(room.availableCards.length).toBeGreaterThanOrEqual(2)
-      expect(room.availableCards.length).toBeLessThanOrEqual(4)
-    })
-
-    it('should pause game when player leaves', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      expect(room.currentPhase).toBe('plan')
-
-      room.removePlayer(player1.id)
-      expect(room.currentPhase).toBe('waiting')
-    })
-  })
-
-  describe('role switching', () => {
-    it('should assign different roles to players', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      const player2 = room.addPlayer(ws2)
-
-      const roles = room.getRoles()
-      const roleValues = Object.values(roles)
-
-      expect(roleValues).toContain('designer')
-      expect(roleValues).toContain('tester')
-    })
-
-    it('should alternate roles between turns', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      const turn1Roles = room.getRoles()
-      const player1Role1 = turn1Roles[player1.id]
-
-      // Simulate turn advance
-      room.currentTurn++
-      const turn2Roles = room.getRoles()
-      const player1Role2 = turn2Roles[player1.id]
-
-      expect(player1Role1).not.toBe(player1Role2)
-    })
-  })
-
-  describe('card selection', () => {
-    it('should track card selections', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      const cardId = room.availableCards[0].id
-      room.selectCard(player1.id, cardId)
-
-      expect(room.cardSelections.size).toBe(1)
-      expect(room.cardSelections.get(player1.id)).toBe(cardId)
-    })
-
-    it('should ignore invalid card selections', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      room.selectCard(player1.id, 'invalid_card_id')
-      expect(room.cardSelections.size).toBe(0)
-    })
-
-    it('should ignore selections outside plan phase', () => {
-      const ws1 = createMockWs()
-      const ws2 = createMockWs()
-
-      const player1 = room.addPlayer(ws1)
-      room.addPlayer(ws2)
-
-      room.currentPhase = 'resolve'
-      const cardId = room.availableCards[0].id
-      room.selectCard(player1.id, cardId)
-
-      expect(room.cardSelections.size).toBe(0)
-    })
-  })
-
-  describe('state serialization', () => {
-    it('should return complete state object', () => {
+    it('should get player by id', () => {
       const ws = createMockWs()
-      room.addPlayer(ws)
+      const player = room.addPlayer(ws)
 
-      const state = room.getState()
+      const found = room.getPlayer(player.id)
+      expect(found).toBe(player)
+    })
 
-      expect(state).toHaveProperty('roomId')
-      expect(state).toHaveProperty('playerCount')
-      expect(state).toHaveProperty('turn')
-      expect(state).toHaveProperty('phase')
-      expect(state).toHaveProperty('world')
+    it('should return undefined for non-existent player', () => {
+      const found = room.getPlayer('non-existent')
+      expect(found).toBeUndefined()
     })
   })
 
@@ -207,14 +92,55 @@ describe('Room', () => {
       room.addPlayer(ws1)
       room.addPlayer(ws2)
 
-      // Clear previous calls from game start
-      ws1.send.mockClear()
-      ws2.send.mockClear()
-
       room.broadcast({ type: 'test' }, ws1)
 
       expect(ws1.send).not.toHaveBeenCalled()
       expect(ws2.send).toHaveBeenCalled()
+    })
+
+    it('should serialize message as JSON', () => {
+      const ws = createMockWs()
+      room.addPlayer(ws)
+
+      const message = { type: 'test', data: 123 }
+      room.broadcast(message)
+
+      expect(ws.send).toHaveBeenCalledWith(JSON.stringify(message))
+    })
+
+    it('should skip closed websockets', () => {
+      const wsOpen = createMockWs()
+      const wsClosed = { send: vi.fn(), readyState: 3 } // CLOSED
+
+      room.addPlayer(wsOpen)
+      room.addPlayer(wsClosed)
+
+      room.broadcast({ type: 'test' })
+
+      expect(wsOpen.send).toHaveBeenCalled()
+      expect(wsClosed.send).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('sendTo', () => {
+    it('should send message to specific player', () => {
+      const ws1 = createMockWs()
+      const ws2 = createMockWs()
+
+      const player1 = room.addPlayer(ws1)
+      room.addPlayer(ws2)
+
+      const message = { type: 'private', data: 'hello' }
+      room.sendTo(player1.id, message)
+
+      expect(ws1.send).toHaveBeenCalledWith(JSON.stringify(message))
+      expect(ws2.send).not.toHaveBeenCalled()
+    })
+
+    it('should not crash for non-existent player', () => {
+      expect(() => {
+        room.sendTo('non-existent', { type: 'test' })
+      }).not.toThrow()
     })
   })
 })

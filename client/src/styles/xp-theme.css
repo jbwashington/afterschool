@@ -1,0 +1,591 @@
+/* Windows XP Luna Blue Theme */
+
+:root {
+  /* Titlebar gradients */
+  --xp-titlebar-active-start: #0058e6;
+  --xp-titlebar-active-mid: #3a93ff;
+  --xp-titlebar-active-end: #0058e6;
+  --xp-titlebar-inactive-start: #7f9db9;
+  --xp-titlebar-inactive-mid: #b0c7e2;
+  --xp-titlebar-inactive-end: #7f9db9;
+
+  /* Taskbar */
+  --xp-taskbar-start: #1f3f7a;
+  --xp-taskbar-mid: #3168d5;
+  --xp-taskbar-end: #2456a8;
+
+  /* Start button */
+  --xp-start-green-start: #3c8f3c;
+  --xp-start-green-mid: #379137;
+  --xp-start-green-end: #267526;
+
+  /* Window colors */
+  --xp-button-face: #ece9d8;
+  --xp-button-shadow: #aca899;
+  --xp-button-highlight: #ffffff;
+  --xp-window-bg: #ece9d8;
+  --xp-window-border: #0054e3;
+
+  /* Text */
+  --xp-text-dark: #000000;
+  --xp-text-light: #ffffff;
+  --xp-text-titlebar: #ffffff;
+
+  /* Desktop */
+  --xp-desktop-bg: #3a6ea5;
+
+  /* Selection */
+  --xp-selection-bg: #316ac5;
+  --xp-selection-text: #ffffff;
+}
+
+/* Desktop */
+.xp-desktop {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #245edc 0%, #3a6ea5 50%, #1f4e8a 100%);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.xp-desktop-icons {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 8px;
+  padding: 12px;
+  height: calc(100vh - 40px);
+}
+
+/* Desktop Icon */
+.xp-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 75px;
+  padding: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.xp-icon:hover {
+  background: rgba(49, 106, 197, 0.4);
+  border-color: rgba(49, 106, 197, 0.6);
+}
+
+.xp-icon.selected {
+  background: rgba(49, 106, 197, 0.6);
+  border-color: rgba(49, 106, 197, 0.8);
+}
+
+.xp-icon-image {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.xp-icon-label {
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  word-wrap: break-word;
+  max-width: 70px;
+  line-height: 1.2;
+}
+
+/* Taskbar */
+.xp-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg,
+    var(--xp-taskbar-start) 0%,
+    var(--xp-taskbar-mid) 3%,
+    var(--xp-taskbar-end) 100%
+  );
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  border-top: 1px solid #0f4ac4;
+  z-index: 9999;
+}
+
+/* Start Button */
+.xp-start-button {
+  background: linear-gradient(180deg,
+    var(--xp-start-green-start) 0%,
+    var(--xp-start-green-mid) 50%,
+    var(--xp-start-green-end) 100%
+  );
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 2px 12px 2px 6px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  font-style: italic;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.3),
+    1px 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.xp-start-button:hover {
+  filter: brightness(1.1);
+}
+
+.xp-start-button:active {
+  filter: brightness(0.95);
+}
+
+.xp-start-button .xp-start-logo {
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+}
+
+/* Task buttons area */
+.xp-task-buttons {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  height: 100%;
+}
+
+.xp-task-button {
+  background: linear-gradient(180deg,
+    #3c7fb8 0%,
+    #2968a3 50%,
+    #1e5188 100%
+  );
+  border: 1px solid #1e4577;
+  border-radius: 3px;
+  padding: 2px 8px;
+  height: 24px;
+  min-width: 150px;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: white;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.xp-task-button:hover {
+  background: linear-gradient(180deg,
+    #4a91cc 0%,
+    #3478b5 50%,
+    #266199 100%
+  );
+}
+
+.xp-task-button.active {
+  background: linear-gradient(180deg,
+    #1e5188 0%,
+    #2968a3 50%,
+    #3c7fb8 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.xp-task-button-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+}
+
+/* System Tray */
+.xp-system-tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  height: 100%;
+  background: linear-gradient(180deg,
+    #0f5bc6 0%,
+    #1067d7 50%,
+    #0f5bc6 100%
+  );
+  border-left: 1px solid #1761ce;
+}
+
+.xp-clock {
+  font-size: 11px;
+  color: white;
+  font-family: 'Tahoma', sans-serif;
+}
+
+/* Window */
+.xp-window {
+  position: absolute;
+  background: var(--xp-window-bg);
+  border-radius: 8px 8px 0 0;
+  box-shadow:
+    2px 2px 10px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  min-width: 200px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.xp-window.inactive .xp-titlebar {
+  background: linear-gradient(180deg,
+    var(--xp-titlebar-inactive-start) 0%,
+    var(--xp-titlebar-inactive-mid) 50%,
+    var(--xp-titlebar-inactive-end) 100%
+  );
+}
+
+/* Titlebar */
+.xp-titlebar {
+  background: linear-gradient(180deg,
+    var(--xp-titlebar-active-start) 0%,
+    var(--xp-titlebar-active-mid) 8%,
+    var(--xp-titlebar-active-mid) 40%,
+    var(--xp-titlebar-active-end) 90%,
+    #001c58 100%
+  );
+  height: 28px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  cursor: move;
+}
+
+.xp-titlebar-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  font-size: 14px;
+}
+
+.xp-titlebar-text {
+  flex: 1;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+  font-family: 'Trebuchet MS', 'Tahoma', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xp-titlebar-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+/* Titlebar Buttons */
+.xp-btn-minimize,
+.xp-btn-maximize,
+.xp-btn-close {
+  width: 21px;
+  height: 21px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.xp-btn-minimize,
+.xp-btn-maximize {
+  background: linear-gradient(180deg,
+    #3c8fe8 0%,
+    #1d67c3 50%,
+    #1553a8 100%
+  );
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.4),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.xp-btn-minimize:hover,
+.xp-btn-maximize:hover {
+  background: linear-gradient(180deg,
+    #5aa3f5 0%,
+    #2d7ad9 50%,
+    #2366bb 100%
+  );
+}
+
+.xp-btn-close {
+  background: linear-gradient(180deg,
+    #e88b6f 0%,
+    #c75050 50%,
+    #b33a3a 100%
+  );
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.4),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.xp-btn-close:hover {
+  background: linear-gradient(180deg,
+    #ffa07a 0%,
+    #e06060 50%,
+    #cc4444 100%
+  );
+}
+
+.xp-btn-minimize::after { content: '_'; }
+.xp-btn-maximize::after { content: '\u25A1'; }
+.xp-btn-close::after { content: '\u2715'; }
+
+/* Window Content */
+.xp-window-content {
+  flex: 1;
+  background: white;
+  margin: 3px;
+  overflow: auto;
+  border: 1px solid #7f9db9;
+}
+
+/* Menu Bar */
+.xp-menubar {
+  display: flex;
+  background: var(--xp-button-face);
+  border-bottom: 1px solid var(--xp-button-shadow);
+  padding: 2px 0;
+}
+
+.xp-menu-item {
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.xp-menu-item:hover {
+  background: var(--xp-selection-bg);
+  color: var(--xp-selection-text);
+}
+
+/* Resize handles */
+.xp-resize-handle {
+  position: absolute;
+  background: transparent;
+}
+
+.xp-resize-handle.se {
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+}
+
+.xp-resize-handle.e {
+  right: 0;
+  top: 28px;
+  bottom: 16px;
+  width: 4px;
+  cursor: e-resize;
+}
+
+.xp-resize-handle.s {
+  bottom: 0;
+  left: 0;
+  right: 16px;
+  height: 4px;
+  cursor: s-resize;
+}
+
+/* Start Menu */
+.xp-start-menu {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  width: 380px;
+  background: white;
+  border-radius: 5px 5px 0 0;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: none;
+}
+
+.xp-start-menu.open {
+  display: block;
+}
+
+.xp-start-menu-header {
+  background: linear-gradient(180deg,
+    #2159b7 0%,
+    #1a4a9e 50%,
+    #133c85 100%
+  );
+  height: 54px;
+  border-radius: 5px 5px 0 0;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 8px;
+}
+
+.xp-user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  border: 2px solid white;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  background: #4a6ea5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.xp-user-name {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.xp-start-menu-content {
+  display: flex;
+  min-height: 300px;
+}
+
+.xp-start-menu-left {
+  flex: 1;
+  background: white;
+  padding: 8px 0;
+  border-right: 1px solid #a5b9d1;
+}
+
+.xp-start-menu-right {
+  width: 190px;
+  background: linear-gradient(180deg, #6b9be8 0%, #5789d8 100%);
+  padding: 8px 0;
+}
+
+.xp-start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.xp-start-menu-left .xp-start-menu-item:hover {
+  background: var(--xp-selection-bg);
+  color: var(--xp-selection-text);
+}
+
+.xp-start-menu-right .xp-start-menu-item {
+  color: white;
+  font-weight: bold;
+}
+
+.xp-start-menu-right .xp-start-menu-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.xp-start-menu-item-icon {
+  width: 32px;
+  height: 32px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xp-start-menu-right .xp-start-menu-item-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+}
+
+.xp-start-menu-separator {
+  height: 1px;
+  background: #a5b9d1;
+  margin: 4px 8px;
+}
+
+.xp-start-menu-right .xp-start-menu-separator {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.xp-start-menu-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px;
+  background: linear-gradient(180deg, #3a7ae2 0%, #2461c0 100%);
+  border-top: 1px solid #1b4da0;
+}
+
+.xp-start-menu-footer button {
+  background: linear-gradient(180deg, #e88b6f 0%, #c94b4b 100%);
+  border: 1px solid #8a3232;
+  border-radius: 3px;
+  padding: 4px 16px;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.xp-start-menu-footer button:hover {
+  filter: brightness(1.1);
+}
+
+/* Remote Cursor */
+.xp-remote-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  transition: transform 0.05s linear;
+}
+
+.xp-remote-cursor-pointer {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 16px solid;
+  transform: rotate(-30deg);
+}
+
+.xp-remote-cursor-label {
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  color: white;
+  margin-left: 12px;
+  margin-top: -4px;
+  white-space: nowrap;
+}

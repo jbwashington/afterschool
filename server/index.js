@@ -1,16 +1,122 @@
+import { createServer } from 'http'
 import { WebSocketServer } from 'ws'
 import { RoomManager } from './rooms/RoomManager.js'
 import { MESSAGE_TYPES } from '../shared/constants.js'
+import { handleOllamaChat, handleGenerateAgent, handleAgentDialogue, rateLimitMiddleware } from './api/ollama.js'
 
-const PORT = process.env.PORT || 6767
+const WS_PORT = process.env.WS_PORT || 6767
+const HTTP_PORT = process.env.HTTP_PORT || 6768
 
-const wss = new WebSocketServer({ port: PORT })
+// Create HTTP server for API endpoints
+const httpServer = createServer(async (req, res) => {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204)
+    res.end()
+    return
+  }
+
+  // Parse URL
+  const url = new URL(req.url, `http://localhost:${HTTP_PORT}`)
+
+  // Simple request/response wrapper for compatibility
+  const reqWrapper = {
+    body: null,
+    ip: req.socket.remoteAddress,
+    connection: req.connection,
+  }
+
+  const resWrapper = {
+    statusCode: 200,
+    headers: {},
+    setHeader: (key, value) => { resWrapper.headers[key] = value },
+    status: (code) => {
+      resWrapper.statusCode = code
+      return resWrapper
+    },
+    json: (data) => {
+      res.writeHead(resWrapper.statusCode, {
+        'Content-Type': 'application/json',
+        ...resWrapper.headers
+      })
+      res.end(JSON.stringify(data))
+    }
+  }
+
+  // Rate limiting
+  let rateLimitPassed = true
+  rateLimitMiddleware(reqWrapper, resWrapper, () => { rateLimitPassed = true })
+  if (!rateLimitPassed) return
+
+  // Helper to parse JSON body
+  async function parseBody() {
+    let body = ''
+    for await (const chunk of req) {
+      body += chunk
+    }
+    return JSON.parse(body)
+  }
+
+  // Route: POST /api/ollama/chat (Buddy Bot chat)
+  if (url.pathname === '/api/ollama/chat' && req.method === 'POST') {
+    try {
+      reqWrapper.body = await parseBody()
+      await handleOllamaChat(reqWrapper, resWrapper)
+    } catch (error) {
+      console.error('API error:', error)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Internal server error' }))
+    }
+    return
+  }
+
+  // Route: POST /api/agent/generate (Gemma 3 agent personality generation)
+  if (url.pathname === '/api/agent/generate' && req.method === 'POST') {
+    try {
+      reqWrapper.body = await parseBody()
+      await handleGenerateAgent(reqWrapper, resWrapper)
+    } catch (error) {
+      console.error('Agent generation error:', error)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Internal server error' }))
+    }
+    return
+  }
+
+  // Route: POST /api/agent/dialogue (Gemma 3 dynamic dialogue)
+  if (url.pathname === '/api/agent/dialogue' && req.method === 'POST') {
+    try {
+      reqWrapper.body = await parseBody()
+      await handleAgentDialogue(reqWrapper, resWrapper)
+    } catch (error) {
+      console.error('Dialogue generation error:', error)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Internal server error' }))
+    }
+    return
+  }
+
+  // 404 for unknown routes
+  res.writeHead(404, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify({ error: 'Not found' }))
+})
+
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`🌐 HTTP API server running on port ${HTTP_PORT}`)
+})
+
+// Create WebSocket server
+const wss = new WebSocketServer({ port: WS_PORT })
 const roomManager = new RoomManager()
 
-console.log(`🎮 Town Builders Council server running on port ${PORT}`)
+console.log(`🖥️  sixsevenOS WebSocket server running on port ${WS_PORT}`)
 
 wss.on('connection', (ws, req) => {
-  const url = new URL(req.url, `http://localhost:${PORT}`)
+  const url = new URL(req.url, `http://localhost:${WS_PORT}`)
   const roomId = url.searchParams.get('room') || 'default'
 
   console.log(`[connection] New client connecting to room: ${roomId}`)
@@ -20,7 +126,7 @@ wss.on('connection', (ws, req) => {
   if (!player) {
     ws.send(JSON.stringify({
       type: MESSAGE_TYPES.ERROR,
-      message: 'Room is full (max 2 players)',
+      message: 'Room is full',
     }))
     ws.close()
     return
@@ -32,10 +138,10 @@ wss.on('connection', (ws, req) => {
     playerId: player.id,
     playerNumber: player.number,
     roomId,
-    gameState: roomManager.getRoom(roomId).getState(),
+    playerCount: roomManager.getRoom(roomId).playerCount,
   }))
 
-  // Notify other player
+  // Notify other players
   roomManager.broadcast(roomId, {
     type: MESSAGE_TYPES.PLAYER_JOINED,
     playerId: player.id,
@@ -71,49 +177,89 @@ function handleMessage(roomId, player, message) {
   if (!room) return
 
   switch (message.type) {
-    case MESSAGE_TYPES.SELECT_CARD:
-      room.selectCard(player.id, message.cardId)
-      break
-
-    case MESSAGE_TYPES.AUDIO_SIGNAL:
-      // Forward audio signals to game logic
-      room.handleAudioSignal(player.id, message.signal)
-      break
-
-    // Sandbox mode messages
-    case 'spawn_entity':
-      // Add to game state and broadcast to others
-      room.gameState.spawnEntity(message.entity)
+    // Cursor sync - relay to all other clients
+    case MESSAGE_TYPES.CURSOR_MOVE:
       room.broadcast({
-        type: 'entity_spawn',
+        type: MESSAGE_TYPES.CURSOR_MOVE,
         playerId: player.id,
-        entity: message.entity,
+        playerNumber: player.number,
+        x: message.x,
+        y: message.y,
       }, player.ws)
       break
 
-    case 'change_sky':
+    case MESSAGE_TYPES.CURSOR_DOWN:
       room.broadcast({
-        type: 'sky_change',
+        type: MESSAGE_TYPES.CURSOR_DOWN,
         playerId: player.id,
-        color: message.color,
+        button: message.button,
       }, player.ws)
       break
 
-    case 'change_ground':
+    case MESSAGE_TYPES.CURSOR_UP:
       room.broadcast({
-        type: 'ground_change',
+        type: MESSAGE_TYPES.CURSOR_UP,
         playerId: player.id,
-        color: message.color,
+        button: message.button,
       }, player.ws)
       break
 
-    case 'clear_all':
-      // Clear game state
-      room.gameState.entities.clear()
-      room.gameState.appliedFeatureIds = []
+    // Window events - relay to all other clients
+    case MESSAGE_TYPES.WINDOW_OPEN:
       room.broadcast({
-        type: 'clear_all',
-      })
+        type: MESSAGE_TYPES.WINDOW_OPEN,
+        playerId: player.id,
+        windowId: message.windowId,
+        appId: message.appId,
+        x: message.x,
+        y: message.y,
+      }, player.ws)
+      break
+
+    case MESSAGE_TYPES.WINDOW_CLOSE:
+      room.broadcast({
+        type: MESSAGE_TYPES.WINDOW_CLOSE,
+        playerId: player.id,
+        windowId: message.windowId,
+      }, player.ws)
+      break
+
+    case MESSAGE_TYPES.WINDOW_MOVE:
+      room.broadcast({
+        type: MESSAGE_TYPES.WINDOW_MOVE,
+        playerId: player.id,
+        windowId: message.windowId,
+        x: message.x,
+        y: message.y,
+      }, player.ws)
+      break
+
+    case MESSAGE_TYPES.WINDOW_RESIZE:
+      room.broadcast({
+        type: MESSAGE_TYPES.WINDOW_RESIZE,
+        playerId: player.id,
+        windowId: message.windowId,
+        width: message.width,
+        height: message.height,
+      }, player.ws)
+      break
+
+    case MESSAGE_TYPES.WINDOW_FOCUS:
+      room.broadcast({
+        type: MESSAGE_TYPES.WINDOW_FOCUS,
+        playerId: player.id,
+        windowId: message.windowId,
+      }, player.ws)
+      break
+
+    // File system events
+    case MESSAGE_TYPES.FILE_CREATE:
+    case MESSAGE_TYPES.FILE_UPDATE:
+    case MESSAGE_TYPES.FILE_DELETE:
+      room.broadcast({
+        ...message,
+        playerId: player.id,
+      }, player.ws)
       break
 
     default:

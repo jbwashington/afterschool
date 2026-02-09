@@ -1,0 +1,1129 @@
+/* Kids Only Portal - 90s AOL Aesthetic */
+
+/* CSS Variables */
+:root {
+  --kids-portal-blue: #0033cc;
+  --kids-portal-cyan: #00ffff;
+  --kids-portal-lime: #00ff00;
+  --kids-portal-yellow: #ffff00;
+  --kids-portal-red: #ff0000;
+  --kids-portal-orange: #ff9900;
+  --kids-portal-pink: #ff66b2;
+  --kids-portal-purple: #9933ff;
+}
+
+/* Window overrides for Kids Portal */
+.xp-window.kids-portal-window {
+  min-width: 640px;
+  min-height: 480px;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px #000,
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.xp-window.kids-portal-window .xp-titlebar {
+  display: none;
+}
+
+.xp-window.kids-portal-window .xp-menubar {
+  display: none;
+}
+
+.xp-window.kids-portal-window .xp-window-content {
+  margin: 0;
+  border: none;
+  background: var(--kids-portal-blue);
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Kids Portal Container */
+.kids-portal-container {
+  width: 100%;
+  height: 100%;
+  background: var(--kids-portal-blue);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Decorative Header - 90s Pattern */
+.kids-portal-header {
+  height: 80px;
+  background: linear-gradient(90deg,
+    var(--kids-portal-cyan) 0%,
+    var(--kids-portal-lime) 25%,
+    var(--kids-portal-cyan) 50%,
+    var(--kids-portal-lime) 75%,
+    var(--kids-portal-cyan) 100%
+  );
+  background-size: 200% 100%;
+  animation: headerShimmer 3s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 4px solid #000;
+}
+
+@keyframes headerShimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.kids-portal-header::before,
+.kids-portal-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+}
+
+.kids-portal-header::before {
+  left: 0;
+}
+
+.kids-portal-header::after {
+  right: 0;
+}
+
+.kids-portal-title {
+  font-size: 42px;
+  font-weight: bold;
+  color: var(--kids-portal-red);
+  text-shadow:
+    -3px -3px 0 var(--kids-portal-yellow),
+    3px -3px 0 var(--kids-portal-yellow),
+    -3px 3px 0 var(--kids-portal-yellow),
+    3px 3px 0 var(--kids-portal-yellow),
+    0 0 20px rgba(255, 255, 0, 0.5);
+  letter-spacing: 4px;
+  z-index: 1;
+}
+
+.kids-portal-close-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 30px;
+  height: 30px;
+  background: var(--kids-portal-red);
+  border: 3px solid #000;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: transform 0.1s;
+}
+
+.kids-portal-close-btn:hover {
+  transform: scale(1.1);
+}
+
+.kids-portal-close-btn:active {
+  transform: scale(0.95);
+}
+
+/* Main Content Area */
+.kids-portal-main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Zone Grid */
+.kids-portal-zones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 700px;
+  width: 100%;
+  padding: 10px;
+}
+
+/* Zone Button - Chunky 90s Style */
+.kids-portal-zone-btn {
+  aspect-ratio: 1;
+  background: linear-gradient(180deg, #fff 0%, #ddd 50%, #bbb 100%);
+  border: 4px solid #000;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px;
+  transition: all 0.15s ease;
+  position: relative;
+  box-shadow:
+    4px 4px 0 rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.kids-portal-zone-btn:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    6px 6px 0 rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+
+.kids-portal-zone-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.kids-portal-zone-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.kids-portal-zone-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Zone-specific colors */
+.kids-portal-zone-btn[data-zone="fly-zone"] {
+  background: linear-gradient(180deg, #66b3ff 0%, #0066ff 50%, #0044aa 100%);
+  color: white;
+}
+.kids-portal-zone-btn[data-zone="fly-zone"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="robot-lab"] {
+  background: linear-gradient(180deg, #cc99ff 0%, #9933ff 50%, #6600cc 100%);
+}
+.kids-portal-zone-btn[data-zone="robot-lab"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="sports-arena"] {
+  background: linear-gradient(180deg, #66ff99 0%, #00cc44 50%, #008833 100%);
+}
+.kids-portal-zone-btn[data-zone="sports-arena"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="kid-biz"] {
+  background: linear-gradient(180deg, #ffcc66 0%, #ff9900 50%, #cc7700 100%);
+}
+.kids-portal-zone-btn[data-zone="kid-biz"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="art-studio"] {
+  background: linear-gradient(180deg, #ffb3d9 0%, #ff66b2 50%, #cc4488 100%);
+}
+.kids-portal-zone-btn[data-zone="art-studio"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="play-zone"] {
+  background: linear-gradient(180deg, #66ffff 0%, #00cccc 50%, #009999 100%);
+}
+.kids-portal-zone-btn[data-zone="play-zone"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="maker-space"] {
+  background: linear-gradient(180deg, #9999ff 0%, #4d4dff 50%, #3333cc 100%);
+}
+.kids-portal-zone-btn[data-zone="maker-space"] .kids-portal-zone-name { color: white; }
+
+.kids-portal-zone-btn[data-zone="ai-helper"] {
+  background: linear-gradient(180deg, #ff9999 0%, #ff3333 50%, #cc0000 100%);
+  animation: aiPulse 2s ease-in-out infinite;
+}
+.kids-portal-zone-btn[data-zone="ai-helper"] .kids-portal-zone-name { color: white; }
+
+@keyframes aiPulse {
+  0%, 100% { box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 51, 51, 0.3); }
+  50% { box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 51, 51, 0.6); }
+}
+
+.kids-portal-zone-btn[data-zone="my-stuff"] {
+  background: linear-gradient(180deg, #999999 0%, #666666 50%, #444444 100%);
+}
+.kids-portal-zone-btn[data-zone="my-stuff"] .kids-portal-zone-name { color: white; }
+
+/* Footer - Keyword Bar */
+.kids-portal-footer {
+  height: 36px;
+  background: var(--kids-portal-lime);
+  border-top: 4px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.kids-portal-keyword {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+}
+
+.kids-portal-keyword-input {
+  background: white;
+  border: 2px solid #000;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: 'Arial', sans-serif;
+  width: 150px;
+}
+
+.kids-portal-keyword-btn {
+  background: var(--kids-portal-blue);
+  color: white;
+  border: 2px solid #000;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.kids-portal-keyword-btn:hover {
+  background: #0044dd;
+}
+
+/* Zone View (when navigating into a zone) */
+.kids-portal-zone-view {
+  width: 100%;
+  max-width: 700px;
+}
+
+.kids-portal-zone-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.kids-portal-back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid #000;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.kids-portal-back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.kids-portal-zone-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.kids-portal-zone-icon-large {
+  font-size: 36px;
+}
+
+.kids-portal-zone-desc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.kids-portal-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.kids-portal-category-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.kids-portal-category-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(5px);
+}
+
+.kids-portal-category-icon {
+  font-size: 28px;
+}
+
+.kids-portal-category-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+/* AI Helper Styles */
+.ai-helper-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ai-helper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #ff3333 0%, #ff6666 100%);
+  border-bottom: 3px solid #000;
+}
+
+.ai-helper-back {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.ai-helper-back:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ai-helper-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.ai-helper-icon {
+  font-size: 24px;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(10deg); }
+}
+
+.ai-helper-status {
+  font-size: 12px;
+  color: #00ff00;
+  font-weight: bold;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.ai-helper-status.thinking {
+  color: #ffff00;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.ai-helper-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-message {
+  display: flex;
+  gap: 10px;
+  animation: messageIn 0.3s ease-out;
+}
+
+@keyframes messageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-message-user {
+  flex-direction: row-reverse;
+}
+
+.ai-message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ai-message-bot .ai-message-avatar {
+  background: linear-gradient(135deg, #ff3333 0%, #ff6666 100%);
+}
+
+.ai-message-user .ai-message-avatar {
+  background: linear-gradient(135deg, #0066ff 0%, #3399ff 100%);
+}
+
+.ai-message-content {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.ai-message-bot .ai-message-content {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-bottom-left-radius: 4px;
+}
+
+.ai-message-user .ai-message-content {
+  background: #0066ff;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-loading-dots span {
+  animation: dotPulse 1.4s infinite ease-in-out both;
+  font-size: 24px;
+}
+
+.ai-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.ai-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.ai-loading-dots span:nth-child(3) { animation-delay: 0; }
+
+@keyframes dotPulse {
+  0%, 80%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
+
+.ai-helper-suggestions {
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-helper-suggestions-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 8px;
+}
+
+.ai-helper-suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-helper-suggestion {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 6px 12px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ai-helper-suggestion:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.ai-helper-input-area {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-helper-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.ai-helper-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ai-helper-input:focus {
+  border-color: var(--kids-portal-cyan);
+}
+
+.ai-helper-send {
+  background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
+  border: 2px solid #000;
+  border-radius: 24px;
+  padding: 12px 24px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.ai-helper-send:hover {
+  transform: scale(1.05);
+}
+
+.ai-helper-send:active {
+  transform: scale(0.95);
+}
+
+.ai-helper-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Scrollbar styling */
+.ai-helper-messages::-webkit-scrollbar,
+.kids-portal-main::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ai-helper-messages::-webkit-scrollbar-track,
+.kids-portal-main::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ai-helper-messages::-webkit-scrollbar-thumb,
+.kids-portal-main::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+.ai-helper-messages::-webkit-scrollbar-thumb:hover,
+.kids-portal-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* KID BIZ EMPIRE - Turn-based Agent Management Game                           */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.kidbiz-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #1a0a2e 0%, #0d1b2a 100%);
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+  color: white;
+  overflow: hidden;
+}
+
+.kidbiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #ff9900 0%, #ffcc00 100%);
+  border-bottom: 3px solid #000;
+}
+
+.kidbiz-back-btn {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.kidbiz-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.kidbiz-turn {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.kidbiz-stats {
+  display: flex;
+  gap: 20px;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.kidbiz-stat {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.kidbiz-main {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.kidbiz-map-area {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kidbiz-map {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kidbiz-hex-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.kidbiz-hex {
+  width: 80px;
+  height: 90px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.kidbiz-hex:hover {
+  transform: translateY(-4px);
+  border-color: var(--kids-portal-cyan);
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+}
+
+.kidbiz-hex.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.kidbiz-hex.locked:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+}
+
+.kidbiz-hex-hq {
+  background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
+  border-color: #000;
+}
+
+.kidbiz-hex-station {
+  background: linear-gradient(180deg, rgba(100, 200, 255, 0.3) 0%, rgba(50, 100, 200, 0.3) 100%);
+}
+
+.kidbiz-hex-empty {
+  background: linear-gradient(180deg, rgba(100, 100, 100, 0.2) 0%, rgba(50, 50, 50, 0.2) 100%);
+  border-style: dashed;
+}
+
+.kidbiz-hex-icon {
+  font-size: 28px;
+}
+
+.kidbiz-hex-label {
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.kidbiz-hex-agent {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #00cc44;
+  border: 2px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.kidbiz-map-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.kidbiz-btn {
+  background: linear-gradient(180deg, #4488ff 0%, #2266dd 100%);
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.kidbiz-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.kidbiz-btn:active {
+  transform: translateY(1px);
+}
+
+.kidbiz-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.kidbiz-btn-small {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.kidbiz-btn-small:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.kidbiz-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.kidbiz-panel {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.kidbiz-panel-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kidbiz-empty {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  text-align: center;
+  padding: 10px;
+}
+
+.kidbiz-job {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.kidbiz-job-name {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.kidbiz-job-agent {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.kidbiz-job-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 10px;
+}
+
+.kidbiz-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.kidbiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00cc44 0%, #44ff88 100%);
+  transition: width 0.3s;
+}
+
+.kidbiz-order {
+  background: rgba(255, 200, 100, 0.2);
+  border: 1px solid rgba(255, 200, 100, 0.5);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.kidbiz-order-desc {
+  font-size: 11px;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+
+.kidbiz-order-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.kidbiz-order-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.kidbiz-squad {
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 3px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+}
+
+.kidbiz-squad-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.kidbiz-squad-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.kidbiz-empty-squad {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+}
+
+.kidbiz-agent-card {
+  min-width: 140px;
+  background: linear-gradient(180deg, rgba(100, 100, 200, 0.3) 0%, rgba(50, 50, 150, 0.3) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.kidbiz-agent-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--kids-portal-cyan);
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+}
+
+.kidbiz-agent-avatar {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.kidbiz-agent-info {
+  text-align: center;
+}
+
+.kidbiz-agent-name {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.kidbiz-agent-title {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.kidbiz-agent-status {
+  font-size: 10px;
+  margin-top: 4px;
+  color: var(--kids-portal-cyan);
+}
+
+.kidbiz-agent-mood {
+  text-align: center;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.kidbiz-hire-btn {
+  margin-top: 10px;
+  background: linear-gradient(180deg, #44cc44 0%, #228822 100%);
+}
+
+.kidbiz-message-bar {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 14px;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+}
+
+.kidbiz-message-bar.visible {
+  transform: translateY(0);
+}
+
+/* Modal styles */
+.kidbiz-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.kidbiz-modal-content {
+  background: linear-gradient(180deg, #2a2a4a 0%, #1a1a3a 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  min-width: 300px;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.kidbiz-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+}
+
+.kidbiz-modal-close {
+  background: rgba(255, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.kidbiz-modal-close:hover {
+  background: rgba(255, 0, 0, 0.8);
+}
+
+.kidbiz-modal-body {
+  padding: 16px;
+}
+
+.kidbiz-modal-body p {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+}
+
+.kidbiz-modal-body hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 12px 0;
+}
+
+.kidbiz-station-options,
+.kidbiz-product-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kidbiz-station-options .kidbiz-btn,
+.kidbiz-product-options .kidbiz-btn {
+  width: 100%;
+  text-align: left;
+}

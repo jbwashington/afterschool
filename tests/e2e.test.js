@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Room } from '../server/rooms/Room.js'
-import { MESSAGE_TYPES, GAME } from '../shared/constants.js'
+import { RoomManager } from '../server/rooms/RoomManager.js'
+import { MESSAGE_TYPES, OS } from '../shared/constants.js'
 
 // Mock WebSocket
 const createMockWs = () => ({
@@ -8,258 +9,210 @@ const createMockWs = () => ({
   readyState: 1,
 })
 
-describe('E2E: Complete Game Session', () => {
-  let room
+describe('E2E: Complete OS Session', () => {
+  let roomManager
   let ws1, ws2
   let player1, player2
 
   beforeEach(() => {
-    room = new Room('e2e-test')
+    roomManager = new RoomManager()
     ws1 = createMockWs()
     ws2 = createMockWs()
   })
 
-  it('should complete full join → play → resolve → repeat cycle', async () => {
+  it('should complete full join → cursor sync → window open cycle', () => {
     // === JOIN PHASE ===
-    player1 = room.addPlayer(ws1)
+    player1 = roomManager.addPlayer('e2e-test', ws1)
     expect(player1).not.toBeNull()
-    expect(room.currentPhase).toBe('waiting')
+    expect(player1.number).toBe(1)
 
-    player2 = room.addPlayer(ws2)
+    player2 = roomManager.addPlayer('e2e-test', ws2)
     expect(player2).not.toBeNull()
-    expect(room.currentPhase).toBe('plan')
-    expect(room.currentTurn).toBe(1)
+    expect(player2.number).toBe(2)
 
-    // === PLAN PHASE ===
-    expect(room.availableCards.length).toBeGreaterThanOrEqual(2)
+    const room = roomManager.getRoom('e2e-test')
+    expect(room.playerCount).toBe(2)
 
-    // Both players select cards
-    const card1 = room.availableCards[0]
-    const card2 = room.availableCards[1] || room.availableCards[0]
+    // === CURSOR SYNC ===
+    // Simulate cursor move from player 1
+    room.broadcast({
+      type: MESSAGE_TYPES.CURSOR_MOVE,
+      playerId: player1.id,
+      x: 50,
+      y: 50,
+    }, ws1)
 
-    room.selectCard(player1.id, card1.id)
-    expect(room.cardSelections.size).toBe(1)
+    // Player 2 should receive cursor update
+    expect(ws2.send).toHaveBeenCalledWith(
+      expect.stringContaining('cursor_move')
+    )
 
-    room.selectCard(player2.id, card2.id)
-    expect(room.cardSelections.size).toBe(2)
+    // === WINDOW OPEN ===
+    ws1.send.mockClear()
+    ws2.send.mockClear()
 
-    // === RESOLVE PHASE ===
-    expect(room.currentPhase).toBe('resolve')
+    // Player 1 opens a window
+    room.broadcast({
+      type: MESSAGE_TYPES.WINDOW_OPEN,
+      playerId: player1.id,
+      windowId: 'win_1',
+      appId: 'notepad',
+      x: 100,
+      y: 100,
+    }, ws1)
 
-    // Wait for resolve to complete
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Features should have been applied
-    expect(room.gameState.appliedFeatureIds.length).toBeGreaterThanOrEqual(1)
-
-    // World update should have been broadcast
-    const hasWorldUpdate = ws1.send.mock.calls.some(call => {
-      const msg = JSON.parse(call[0])
-      return msg.type === MESSAGE_TYPES.WORLD_UPDATE && msg.features
-    })
-    expect(hasWorldUpdate).toBe(true)
+    // Player 2 should see the window open
+    expect(ws2.send).toHaveBeenCalledWith(
+      expect.stringContaining('window_open')
+    )
   })
 
-  it('should enforce role alternation across turns', async () => {
-    player1 = room.addPlayer(ws1)
-    player2 = room.addPlayer(ws2)
+  it('should handle player disconnect gracefully', () => {
+    player1 = roomManager.addPlayer('disconnect-test', ws1)
+    player2 = roomManager.addPlayer('disconnect-test', ws2)
 
-    // Get roles for turn 1
-    const turn1Roles = room.getRoles()
+    // Clear initial join messages
+    ws2.send.mockClear()
 
-    // Complete turn 1
-    const card1 = room.availableCards[0]
-    const card2 = room.availableCards[1] || room.availableCards[0]
-    room.selectCard(player1.id, card1.id)
-    room.selectCard(player2.id, card2.id)
+    // Player 1 disconnects
+    roomManager.removePlayer('disconnect-test', player1.id)
 
-    // Wait for turn to complete (resolve + reflect)
-    await new Promise(resolve => setTimeout(resolve, 6000))
+    // Room should still exist with one player
+    const room = roomManager.getRoom('disconnect-test')
+    expect(room).toBeDefined()
+    expect(room.playerCount).toBe(1)
 
-    // Should be on turn 2
-    expect(room.currentTurn).toBe(2)
+    // Room should be cleaned up when last player leaves
+    roomManager.removePlayer('disconnect-test', player2.id)
+    expect(roomManager.getRoom('disconnect-test')).toBeUndefined()
+  })
 
-    // Get roles for turn 2
-    const turn2Roles = room.getRoles()
+  it('should support max players per room', () => {
+    const sockets = []
+    const players = []
 
-    // Roles should have swapped
-    expect(turn1Roles[player1.id]).not.toBe(turn2Roles[player1.id])
-  }, 10000)
-
-  it('should maintain entity count within limits', async () => {
-    player1 = room.addPlayer(ws1)
-    player2 = room.addPlayer(ws2)
-
-    // Play multiple turns
-    for (let i = 0; i < 5; i++) {
-      if (room.currentPhase !== 'plan') {
-        await new Promise(resolve => setTimeout(resolve, 100))
-        continue
-      }
-
-      if (room.availableCards.length < 2) break
-
-      const card1 = room.availableCards[0]
-      const card2 = room.availableCards[Math.min(1, room.availableCards.length - 1)]
-
-      room.selectCard(player1.id, card1.id)
-      room.selectCard(player2.id, card2.id)
-
-      await new Promise(resolve => setTimeout(resolve, 100))
+    // Fill room to capacity
+    for (let i = 0; i < OS.MAX_PLAYERS; i++) {
+      const ws = createMockWs()
+      sockets.push(ws)
+      const player = roomManager.addPlayer('max-test', ws)
+      expect(player).not.toBeNull()
+      players.push(player)
     }
 
-    // Entity count should never exceed limit
-    expect(room.gameState.entityCount).toBeLessThanOrEqual(GAME.MAX_ENTITIES)
-  })
-
-  it('should handle graceful reconnection scenario', async () => {
-    player1 = room.addPlayer(ws1)
-    player2 = room.addPlayer(ws2)
-
-    // Play one turn
-    const card1 = room.availableCards[0]
-    room.selectCard(player1.id, card1.id)
-    room.selectCard(player2.id, card1.id)
-
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // Simulate player 1 disconnect
-    room.removePlayer(player1.id)
-    expect(room.currentPhase).toBe('waiting')
-
-    // State should be serializable for reconnection
-    const state = room.getState()
-    expect(state.world).toBeDefined()
-    expect(state.world.entities).toBeDefined()
-    expect(state.world.appliedFeatureIds.length).toBeGreaterThanOrEqual(1)
-
-    // New player reconnects
-    const ws3 = createMockWs()
-    const player3 = room.addPlayer(ws3)
-    expect(player3).not.toBeNull()
-
-    // Game should still be waiting since only 1 player now
-    // But when second player joins again, world state is preserved
-    expect(room.gameState.appliedFeatureIds.length).toBeGreaterThanOrEqual(1)
+    // Try to add one more - should fail
+    const extraWs = createMockWs()
+    const extraPlayer = roomManager.addPlayer('max-test', extraWs)
+    expect(extraPlayer).toBeNull()
   })
 })
 
-describe('E2E: Agent Module Validation', () => {
+describe('E2E: Message Types Validation', () => {
   let room
   let ws1, ws2
 
   beforeEach(() => {
-    room = new Room('agent-test')
+    room = new Room('msg-test')
     ws1 = createMockWs()
     ws2 = createMockWs()
     room.addPlayer(ws1)
     room.addPlayer(ws2)
   })
 
-  it('should validate all feature modules before execution', () => {
-    const registry = room.featureRegistry
+  it('should handle all cursor message types', () => {
+    const cursorTypes = [
+      MESSAGE_TYPES.CURSOR_MOVE,
+      MESSAGE_TYPES.CURSOR_DOWN,
+      MESSAGE_TYPES.CURSOR_UP,
+    ]
 
-    // All features should be valid
-    for (const [id, feature] of registry.features) {
-      expect(feature.id).toBeDefined()
-      expect(feature.name).toBeDefined()
-      expect(feature.category).toBeDefined()
-
-      // If has spawn, should have valid structure
-      if (feature.spawn) {
-        expect(Array.isArray(feature.spawn)).toBe(true)
-        for (const spawn of feature.spawn) {
-          expect(spawn.type).toBeDefined()
-        }
-      }
-
-      // If has rules, should have valid structure
-      if (feature.rules) {
-        expect(Array.isArray(feature.rules)).toBe(true)
-        for (const rule of feature.rules) {
-          expect(rule.trigger).toBeDefined()
-          expect(rule.effect).toBeDefined()
-        }
-      }
-
-      // Should have constraints
-      if (feature.constraints) {
-        expect(typeof feature.constraints).toBe('object')
-      }
+    for (const type of cursorTypes) {
+      ws2.send.mockClear()
+      room.broadcast({ type }, ws1)
+      expect(ws2.send).toHaveBeenCalled()
     }
   })
 
-  it('should reject malformed feature application', () => {
-    // Try to apply a non-existent feature
-    const fakeCard = { id: 'malformed_feature_xyz' }
-    const result = room.featureRegistry.applyCard(fakeCard, room.gameState)
+  it('should handle all window message types', () => {
+    const windowTypes = [
+      MESSAGE_TYPES.WINDOW_OPEN,
+      MESSAGE_TYPES.WINDOW_CLOSE,
+      MESSAGE_TYPES.WINDOW_MOVE,
+      MESSAGE_TYPES.WINDOW_RESIZE,
+      MESSAGE_TYPES.WINDOW_FOCUS,
+      MESSAGE_TYPES.WINDOW_MINIMIZE,
+      MESSAGE_TYPES.WINDOW_MAXIMIZE,
+    ]
 
-    expect(result).toBeNull()
-    // Game should not crash
-    expect(room.currentPhase).toBe('plan')
+    for (const type of windowTypes) {
+      ws2.send.mockClear()
+      room.broadcast({ type, windowId: 'test' }, ws1)
+      expect(ws2.send).toHaveBeenCalled()
+    }
   })
 
-  it('should enforce feature constraints', () => {
-    // Find a feature with maxCount: 1
-    let singleUseFeature = null
-    for (const [id, feature] of room.featureRegistry.features) {
-      if (feature.constraints?.maxCount === 1) {
-        singleUseFeature = feature
-        break
-      }
-    }
+  it('should handle all file system message types', () => {
+    const fileTypes = [
+      MESSAGE_TYPES.FILE_CREATE,
+      MESSAGE_TYPES.FILE_UPDATE,
+      MESSAGE_TYPES.FILE_DELETE,
+      MESSAGE_TYPES.FILE_MOVE,
+    ]
 
-    if (singleUseFeature) {
-      // Apply it once - should succeed
-      const result1 = room.featureRegistry.applyCard(
-        { id: singleUseFeature.id },
-        room.gameState
-      )
-      expect(result1).not.toBeNull()
-
-      // Apply it again - should fail
-      const result2 = room.featureRegistry.applyCard(
-        { id: singleUseFeature.id },
-        room.gameState
-      )
-      expect(result2).toBeNull()
+    for (const type of fileTypes) {
+      ws2.send.mockClear()
+      room.broadcast({ type, path: 'C:/test.txt' }, ws1)
+      expect(ws2.send).toHaveBeenCalled()
     }
   })
 })
 
-describe('E2E: Deterministic Turn Resolution', () => {
-  it('should produce same results given same inputs', async () => {
-    // Create two identical rooms
-    const room1 = new Room('determ-1')
-    const room2 = new Room('determ-2')
+describe('E2E: Multi-Room Isolation', () => {
+  let roomManager
 
-    const ws1a = createMockWs()
-    const ws1b = createMockWs()
-    const ws2a = createMockWs()
-    const ws2b = createMockWs()
+  beforeEach(() => {
+    roomManager = new RoomManager()
+  })
 
-    room1.addPlayer(ws1a)
-    room1.addPlayer(ws1b)
-    room2.addPlayer(ws2a)
-    room2.addPlayer(ws2b)
+  it('should isolate messages between rooms', () => {
+    const ws1 = createMockWs()
+    const ws2 = createMockWs()
+    const ws3 = createMockWs()
 
-    // Both rooms should start with same state
-    expect(room1.currentTurn).toBe(room2.currentTurn)
-    expect(room1.currentPhase).toBe(room2.currentPhase)
+    roomManager.addPlayer('room-a', ws1)
+    roomManager.addPlayer('room-a', ws2)
+    roomManager.addPlayer('room-b', ws3)
 
-    // Note: Card generation has randomness, but the game state processing is deterministic
-    // If we apply the same features, we should get the same results
-    const testFeature = room1.featureRegistry.getFeature('playground')
+    // Clear initial join messages
+    ws1.send.mockClear()
+    ws2.send.mockClear()
+    ws3.send.mockClear()
 
-    if (testFeature) {
-      const results1 = room1.gameState.applyFeature(testFeature)
-      const results2 = room2.gameState.applyFeature(testFeature)
+    // Broadcast to room-a
+    roomManager.broadcast('room-a', { type: 'test-message' }, ws1)
 
-      // Same feature should produce same number of results
-      expect(results1.length).toBe(results2.length)
+    // ws2 should receive (same room)
+    expect(ws2.send).toHaveBeenCalled()
 
-      // Entity counts should match
-      expect(room1.gameState.entityCount).toBe(room2.gameState.entityCount)
-    }
+    // ws3 should NOT receive (different room)
+    expect(ws3.send).not.toHaveBeenCalled()
+  })
+
+  it('should manage multiple rooms independently', () => {
+    const ws1 = createMockWs()
+    const ws2 = createMockWs()
+
+    const player1 = roomManager.addPlayer('room-x', ws1)
+    const player2 = roomManager.addPlayer('room-y', ws2)
+
+    expect(roomManager.getRoom('room-x').playerCount).toBe(1)
+    expect(roomManager.getRoom('room-y').playerCount).toBe(1)
+
+    // Removing player from one room shouldn't affect other
+    roomManager.removePlayer('room-x', player1.id)
+
+    expect(roomManager.getRoom('room-x')).toBeUndefined()
+    expect(roomManager.getRoom('room-y')).toBeDefined()
+    expect(roomManager.getRoom('room-y').playerCount).toBe(1)
   })
 })

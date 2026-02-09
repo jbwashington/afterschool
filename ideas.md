@@ -1,0 +1,8 @@
+- sixsevenOS: web based OS for kids
+- inspired by windows xp
+- easter eggs hidden throughout
+- multiplayer functionality, 2 users in one OS instance should see each other's cursors
+- winamp, minesweeper, MS paint clone, terminal, browser, messenger, settings panel, media player, file manager, calendar, text editor
+- wold like a terminal app with custom terminal, possibly based on ghosttylib
+- custom terminal for kids, but way overpowered
+- feature: multi-agent team orchestration for kids disguised as a turn based civilization 5 style strategy game clone where the agents are actually producing digital products and services that can be sold online in real life (art prints, informational guides and ebooks/pdfs, t-shirt designs, birthday cards, or anything else that can be a gamified production studio/factory for a ecommerce store. )

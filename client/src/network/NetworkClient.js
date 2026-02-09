@@ -1,3 +1,5 @@
+import { MESSAGE_TYPES } from '../../../shared/constants.js'
+
 export class NetworkClient {
   constructor(url) {
     this.url = url
@@ -5,20 +7,29 @@ export class NetworkClient {
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 5
 
-    // Callbacks
+    // Connection callbacks
     this.onConnected = null
     this.onPlayerJoined = null
     this.onPlayerLeft = null
-    this.onTurnStart = null
-    this.onTurnEnd = null
-    this.onCardSelected = null
-    this.onWorldUpdate = null
-    this.onEntitySpawn = null
-    this.onSkyChange = null
-    this.onGroundChange = null
-    this.onClearAll = null
     this.onError = null
     this.onDisconnected = null
+
+    // Cursor callbacks
+    this.onCursorMove = null
+    this.onCursorDown = null
+    this.onCursorUp = null
+
+    // Window callbacks
+    this.onWindowOpen = null
+    this.onWindowClose = null
+    this.onWindowMove = null
+    this.onWindowResize = null
+    this.onWindowFocus = null
+
+    // File system callbacks
+    this.onFileCreate = null
+    this.onFileUpdate = null
+    this.onFileDelete = null
   }
 
   connect() {
@@ -70,61 +81,70 @@ export class NetworkClient {
   }
 
   handleMessage(message) {
-    console.log('[network] Received:', message.type)
+    // console.log('[network] Received:', message.type)
 
     switch (message.type) {
-      case 'room_joined':
+      // Connection messages
+      case MESSAGE_TYPES.ROOM_JOINED:
         if (this.onConnected) this.onConnected(message)
         break
 
-      case 'player_joined':
+      case MESSAGE_TYPES.PLAYER_JOINED:
         if (this.onPlayerJoined) this.onPlayerJoined(message)
         break
 
-      case 'player_left':
+      case MESSAGE_TYPES.PLAYER_LEFT:
         if (this.onPlayerLeft) this.onPlayerLeft(message)
         break
 
-      case 'turn_start':
-        if (this.onTurnStart) this.onTurnStart(message)
+      // Cursor messages
+      case MESSAGE_TYPES.CURSOR_MOVE:
+        if (this.onCursorMove) this.onCursorMove(message)
         break
 
-      case 'turn_end':
-        if (this.onTurnEnd) this.onTurnEnd(message)
+      case MESSAGE_TYPES.CURSOR_DOWN:
+        if (this.onCursorDown) this.onCursorDown(message)
         break
 
-      case 'card_selected':
-        if (this.onCardSelected) this.onCardSelected(message)
+      case MESSAGE_TYPES.CURSOR_UP:
+        if (this.onCursorUp) this.onCursorUp(message)
         break
 
-      case 'world_update':
-        if (this.onWorldUpdate) this.onWorldUpdate(message)
+      // Window messages
+      case MESSAGE_TYPES.WINDOW_OPEN:
+        if (this.onWindowOpen) this.onWindowOpen(message)
         break
 
-      case 'game_state':
-        // Handle reconnection state sync
-        if (this.onConnected) {
-          this.onConnected({ gameState: message.state })
-        }
+      case MESSAGE_TYPES.WINDOW_CLOSE:
+        if (this.onWindowClose) this.onWindowClose(message)
         break
 
-      case 'entity_spawn':
-        if (this.onEntitySpawn) this.onEntitySpawn(message)
+      case MESSAGE_TYPES.WINDOW_MOVE:
+        if (this.onWindowMove) this.onWindowMove(message)
         break
 
-      case 'sky_change':
-        if (this.onSkyChange) this.onSkyChange(message)
+      case MESSAGE_TYPES.WINDOW_RESIZE:
+        if (this.onWindowResize) this.onWindowResize(message)
         break
 
-      case 'ground_change':
-        if (this.onGroundChange) this.onGroundChange(message)
+      case MESSAGE_TYPES.WINDOW_FOCUS:
+        if (this.onWindowFocus) this.onWindowFocus(message)
         break
 
-      case 'clear_all':
-        if (this.onClearAll) this.onClearAll()
+      // File system messages
+      case MESSAGE_TYPES.FILE_CREATE:
+        if (this.onFileCreate) this.onFileCreate(message)
         break
 
-      case 'error':
+      case MESSAGE_TYPES.FILE_UPDATE:
+        if (this.onFileUpdate) this.onFileUpdate(message)
+        break
+
+      case MESSAGE_TYPES.FILE_DELETE:
+        if (this.onFileDelete) this.onFileDelete(message)
+        break
+
+      case MESSAGE_TYPES.ERROR:
         if (this.onError) this.onError(message)
         break
 

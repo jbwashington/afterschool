@@ -1,29 +1,10 @@
-// Game constants shared between client and server
+// sixsevenOS constants shared between client and server
 
-export const GAME = {
-  MAX_PLAYERS: 2,
-  MAX_ENTITIES: 50,
-  NETWORK_UPDATE_HZ: 20,
-  TURN_PHASES: ['plan', 'resolve', 'reflect'],
-  ROLES: ['designer', 'tester'],
+export const OS = {
+  MAX_PLAYERS: 10,
+  CURSOR_UPDATE_HZ: 20,
+  MAX_WINDOWS: 20,
 }
-
-export const CARD_CATEGORIES = {
-  BUILD: 'build',
-  RULES: 'rules',
-  DECOR: 'decor',
-  EVENTS: 'events',
-}
-
-export const ALLOWED_ACTIONS = [
-  'spawn_object',
-  'remove_object',
-  'animate_property',
-  'change_color',
-  'apply_physics_modifier',
-  'play_sound',
-  'register_event_listener',
-]
 
 export const MESSAGE_TYPES = {
   // Connection
@@ -32,40 +13,38 @@ export const MESSAGE_TYPES = {
   PLAYER_JOINED: 'player_joined',
   PLAYER_LEFT: 'player_left',
 
-  // Game state
-  GAME_STATE: 'game_state',
-  TURN_START: 'turn_start',
-  TURN_END: 'turn_end',
+  // Cursor sync
+  CURSOR_MOVE: 'cursor_move',
+  CURSOR_DOWN: 'cursor_down',
+  CURSOR_UP: 'cursor_up',
 
-  // Player actions
-  SELECT_CARD: 'select_card',
-  CARD_SELECTED: 'card_selected',
+  // Window events
+  WINDOW_OPEN: 'window_open',
+  WINDOW_CLOSE: 'window_close',
+  WINDOW_MOVE: 'window_move',
+  WINDOW_RESIZE: 'window_resize',
+  WINDOW_FOCUS: 'window_focus',
+  WINDOW_MINIMIZE: 'window_minimize',
+  WINDOW_MAXIMIZE: 'window_maximize',
 
-  // Audio signals
-  AUDIO_SIGNAL: 'audio_signal',
-
-  // World updates
-  WORLD_UPDATE: 'world_update',
-  ENTITY_SPAWN: 'entity_spawn',
-  ENTITY_REMOVE: 'entity_remove',
-
-  // Sandbox mode
-  SPAWN_ENTITY: 'spawn_entity',
-  ENTITY_SPAWN: 'entity_spawn',
-  CHANGE_SKY: 'change_sky',
-  SKY_CHANGE: 'sky_change',
-  CLEAR_ALL: 'clear_all',
+  // File system
+  FILE_CREATE: 'file_create',
+  FILE_UPDATE: 'file_update',
+  FILE_DELETE: 'file_delete',
+  FILE_MOVE: 'file_move',
 
   // Errors
   ERROR: 'error',
 }
 
-export const ENTITY_TYPES = {
-  GROUND: 'ground',
-  BUILDING: 'building',
-  TREE: 'tree',
-  PLAYGROUND: 'playground',
-  NPC: 'npc',
-  DECORATION: 'decoration',
-  EFFECT: 'effect',
+export const WINDOW_STATE = {
+  NORMAL: 'normal',
+  MINIMIZED: 'minimized',
+  MAXIMIZED: 'maximized',
+}
+
+export const DEFAULT_APPS = {
+  NOTEPAD: 'notepad',
+  MY_COMPUTER: 'my_computer',
+  RECYCLE_BIN: 'recycle_bin',
 }
