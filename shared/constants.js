@@ -48,3 +48,26 @@ export const DEFAULT_APPS = {
   MY_COMPUTER: 'my_computer',
   RECYCLE_BIN: 'recycle_bin',
 }
+
+// BeatLab music room message types
+export const BEATLAB_MESSAGE_TYPES = {
+  ROOM_LIST: 'beatlab:room_list',
+  CREATE_ROOM: 'beatlab:create_room',
+  JOIN_ROOM: 'beatlab:join_room',
+  LEAVE_ROOM: 'beatlab:leave_room',
+  ROOM_STATE: 'beatlab:room_state',
+  ROOM_CREATED: 'beatlab:room_created',
+  ROOM_JOINED: 'beatlab:room_joined',
+  PLAYER_JOINED: 'beatlab:player_joined',
+  PLAYER_LEFT: 'beatlab:player_left',
+  PATTERN_UPDATE: 'beatlab:pattern_update',
+  TEMPO_CHANGE: 'beatlab:tempo_change',
+  PLAY_STATE: 'beatlab:play_state',
+}
+
+export const BEATLAB_CONFIG = {
+  MAX_PLAYERS_PER_ROOM: 4,
+  STEPS: 16,
+  TRACKS: 8,
+  DEFAULT_TEMPO: 120,
+}

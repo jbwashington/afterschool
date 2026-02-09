@@ -6,6 +6,7 @@ import { WindowManager } from './os/WindowManager.js'
 import { AppRegistry } from './apps/AppRegistry.js'
 import { NotepadApp } from './apps/notepad/Notepad.js'
 import { WinampApp } from './apps/winamp/Winamp.js'
+import { BeatLabApp } from './apps/beatlab/BeatLab.js'
 import { KidsOnlyPortalApp } from './apps/kids-portal/KidsOnlyPortal.js'
 import { MyComputerApp, MyDocumentsApp, RecycleBinApp } from './apps/system/SystemApps.js'
 import { VirtualFileSystem } from './filesystem/VirtualFileSystem.js'
@@ -92,6 +93,7 @@ class SixSevenOS {
   registerApps() {
     this.appRegistry.register('notepad', NotepadApp)
     this.appRegistry.register('winamp', WinampApp)
+    this.appRegistry.register('beatlab', BeatLabApp)
     this.appRegistry.register('kids_portal', KidsOnlyPortalApp)
     this.appRegistry.register('my_computer', MyComputerApp)
     this.appRegistry.register('my_documents', MyDocumentsApp)

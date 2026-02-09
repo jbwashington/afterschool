@@ -1,7 +1,7 @@
 import { createServer } from 'http'
 import { WebSocketServer } from 'ws'
 import { RoomManager } from './rooms/RoomManager.js'
-import { MESSAGE_TYPES } from '../shared/constants.js'
+import { MESSAGE_TYPES, BEATLAB_MESSAGE_TYPES, BEATLAB_CONFIG } from '../shared/constants.js'
 import { handleOllamaChat, handleGenerateAgent, handleAgentDialogue, rateLimitMiddleware } from './api/ollama.js'
 
 const WS_PORT = process.env.WS_PORT || 6767
@@ -162,6 +162,21 @@ wss.on('connection', (ws, req) => {
   // Handle disconnect
   ws.on('close', () => {
     console.log(`[disconnect] Player ${player.id} left room ${roomId}`)
+
+    // Clean up BeatLab room membership if applicable
+    if (player.beatLabRoomId) {
+      const beatLabRoom = roomManager.getBeatLabRoom(player.beatLabRoomId)
+      if (beatLabRoom) {
+        beatLabRoom.players.delete(player.beatLabPlayerId)
+        beatLabRoom.broadcast({
+          type: BEATLAB_MESSAGE_TYPES.PLAYER_LEFT,
+          playerId: player.beatLabPlayerId,
+          players: getPlayerList(beatLabRoom)
+        })
+        roomManager.cleanupBeatLabRoom(player.beatLabRoomId)
+      }
+    }
+
     roomManager.removePlayer(roomId, player.id)
 
     roomManager.broadcast(roomId, {
@@ -262,7 +277,208 @@ function handleMessage(roomId, player, message) {
       }, player.ws)
       break
 
+    // ===== BeatLab Music Room Messages =====
+    case BEATLAB_MESSAGE_TYPES.ROOM_LIST:
+      // Send list of active BeatLab rooms
+      player.ws.send(JSON.stringify({
+        type: BEATLAB_MESSAGE_TYPES.ROOM_LIST,
+        rooms: roomManager.getBeatLabRoomList()
+      }))
+      break
+
+    case BEATLAB_MESSAGE_TYPES.CREATE_ROOM:
+      handleBeatLabCreateRoom(player, message)
+      break
+
+    case BEATLAB_MESSAGE_TYPES.JOIN_ROOM:
+      handleBeatLabJoinRoom(player, message)
+      break
+
+    case BEATLAB_MESSAGE_TYPES.LEAVE_ROOM:
+      handleBeatLabLeaveRoom(player, message)
+      break
+
+    case BEATLAB_MESSAGE_TYPES.PATTERN_UPDATE:
+      handleBeatLabPatternUpdate(player, message)
+      break
+
+    case BEATLAB_MESSAGE_TYPES.TEMPO_CHANGE:
+      handleBeatLabTempoChange(player, message)
+      break
+
+    case BEATLAB_MESSAGE_TYPES.PLAY_STATE:
+      handleBeatLabPlayState(player, message)
+      break
+
     default:
       console.log(`[message] Unknown type: ${message.type}`)
   }
+}
+
+// ===== BeatLab Handler Functions =====
+
+function handleBeatLabCreateRoom(player, message) {
+  const room = roomManager.createBeatLabRoom(message.roomName || 'Untitled Room')
+
+  // Add the creating player to the room
+  const beatLabPlayer = {
+    id: `beatlab_${player.id}`,
+    name: `Player 1`,
+    ws: player.ws
+  }
+  room.players.set(beatLabPlayer.id, beatLabPlayer)
+
+  // Store reference to BeatLab room on player
+  player.beatLabRoomId = room.id
+  player.beatLabPlayerId = beatLabPlayer.id
+
+  // Send room created confirmation with state
+  player.ws.send(JSON.stringify({
+    type: BEATLAB_MESSAGE_TYPES.ROOM_CREATED,
+    roomId: room.id,
+    roomName: room.jamState.roomName,
+    playerId: beatLabPlayer.id,
+    pattern: room.jamState.pattern,
+    tempo: room.jamState.tempo,
+    isPlaying: room.jamState.isPlaying,
+    players: getPlayerList(room)
+  }))
+
+  console.log(`[beatlab] Player created room: ${room.id}`)
+}
+
+function handleBeatLabJoinRoom(player, message) {
+  const room = roomManager.getBeatLabRoom(message.roomId)
+
+  if (!room) {
+    player.ws.send(JSON.stringify({
+      type: MESSAGE_TYPES.ERROR,
+      message: 'Room not found'
+    }))
+    return
+  }
+
+  if (room.playerCount >= BEATLAB_CONFIG.MAX_PLAYERS_PER_ROOM) {
+    player.ws.send(JSON.stringify({
+      type: MESSAGE_TYPES.ERROR,
+      message: 'Room is full'
+    }))
+    return
+  }
+
+  // Add the player to the room
+  const playerNumber = room.playerCount + 1
+  const beatLabPlayer = {
+    id: `beatlab_${player.id}`,
+    name: `Player ${playerNumber}`,
+    ws: player.ws
+  }
+  room.players.set(beatLabPlayer.id, beatLabPlayer)
+
+  // Store reference on player
+  player.beatLabRoomId = room.id
+  player.beatLabPlayerId = beatLabPlayer.id
+
+  // Send room state to joining player
+  player.ws.send(JSON.stringify({
+    type: BEATLAB_MESSAGE_TYPES.ROOM_JOINED,
+    roomId: room.id,
+    roomName: room.jamState.roomName,
+    playerId: beatLabPlayer.id,
+    pattern: room.jamState.pattern,
+    tempo: room.jamState.tempo,
+    isPlaying: room.jamState.isPlaying,
+    players: getPlayerList(room)
+  }))
+
+  // Notify other players
+  room.broadcast({
+    type: BEATLAB_MESSAGE_TYPES.PLAYER_JOINED,
+    playerId: beatLabPlayer.id,
+    players: getPlayerList(room)
+  }, player.ws)
+
+  console.log(`[beatlab] Player joined room: ${room.id} (${room.playerCount} players)`)
+}
+
+function handleBeatLabLeaveRoom(player, message) {
+  const room = roomManager.getBeatLabRoom(message.roomId)
+  if (!room || !player.beatLabPlayerId) return
+
+  // Remove player from room
+  room.players.delete(player.beatLabPlayerId)
+
+  // Notify remaining players
+  room.broadcast({
+    type: BEATLAB_MESSAGE_TYPES.PLAYER_LEFT,
+    playerId: player.beatLabPlayerId,
+    players: getPlayerList(room)
+  })
+
+  console.log(`[beatlab] Player left room: ${room.id} (${room.playerCount} players)`)
+
+  // Cleanup empty room
+  roomManager.cleanupBeatLabRoom(room.id)
+
+  // Clear player's room reference
+  player.beatLabRoomId = null
+  player.beatLabPlayerId = null
+}
+
+function handleBeatLabPatternUpdate(player, message) {
+  const room = roomManager.getBeatLabRoom(message.roomId)
+  if (!room || !room.jamState) return
+
+  // Update pattern state
+  const { track, step, value } = message
+  if (track >= 0 && track < BEATLAB_CONFIG.TRACKS &&
+      step >= 0 && step < BEATLAB_CONFIG.STEPS) {
+    room.jamState.pattern[track][step] = value
+
+    // Broadcast to all players in room
+    room.broadcast({
+      type: BEATLAB_MESSAGE_TYPES.PATTERN_UPDATE,
+      playerId: player.beatLabPlayerId,
+      track,
+      step,
+      value
+    }, player.ws)
+  }
+}
+
+function handleBeatLabTempoChange(player, message) {
+  const room = roomManager.getBeatLabRoom(message.roomId)
+  if (!room || !room.jamState) return
+
+  // Update tempo (clamp to valid range)
+  room.jamState.tempo = Math.max(60, Math.min(200, message.tempo))
+
+  // Broadcast to all players in room
+  room.broadcast({
+    type: BEATLAB_MESSAGE_TYPES.TEMPO_CHANGE,
+    playerId: player.beatLabPlayerId,
+    tempo: room.jamState.tempo
+  }, player.ws)
+}
+
+function handleBeatLabPlayState(player, message) {
+  const room = roomManager.getBeatLabRoom(message.roomId)
+  if (!room || !room.jamState) return
+
+  // Update play state
+  room.jamState.isPlaying = message.isPlaying
+
+  // Broadcast to all players in room
+  room.broadcast({
+    type: BEATLAB_MESSAGE_TYPES.PLAY_STATE,
+    playerId: player.beatLabPlayerId,
+    isPlaying: room.jamState.isPlaying
+  }, player.ws)
+}
+
+function getPlayerList(room) {
+  return Array.from(room.players.values()).map(p => ({
+    id: p.id,
+    name: p.name
+  }))
 }

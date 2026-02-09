@@ -11,6 +11,7 @@ export class Desktop {
       { id: 'my_documents', label: 'My Documents', icon: '\uD83D\uDCC1', app: 'my_documents' },
       { id: 'notepad', label: 'Notepad', icon: '\uD83D\uDCDD', app: 'notepad' },
       { id: 'winamp', label: 'Winamp', icon: '🎵', app: 'winamp' },
+      { id: 'beatlab', label: 'BeatLab', icon: '🎹', app: 'beatlab' },
       { id: 'kids_portal', label: 'Kids Only', icon: '🌈', app: 'kids_portal' },
       { id: 'recycle_bin', label: 'Recycle Bin', icon: '\uD83D\uDDD1\uFE0F', app: 'recycle_bin' },
     ]

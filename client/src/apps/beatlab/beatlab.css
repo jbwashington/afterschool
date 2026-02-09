@@ -1,0 +1,617 @@
+/* BeatLab - 90s FL Studio Aesthetic */
+
+/* Window overrides */
+.xp-window.beatlab-window {
+  min-width: 500px;
+  min-height: 400px;
+}
+
+.xp-window.beatlab-window .xp-window-content {
+  background: #1a1a2e;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ===== LOBBY STYLES ===== */
+.beatlab-lobby {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.beatlab-lobby-header {
+  padding: 16px;
+  background: linear-gradient(180deg, #252542 0%, #1e1e38 100%);
+  border-bottom: 2px solid #00ff88;
+  text-align: center;
+}
+
+.beatlab-lobby-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.beatlab-lobby-logo {
+  font-size: 24px;
+  animation: beatlab-pulse 1s ease-in-out infinite;
+}
+
+@keyframes beatlab-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.beatlab-lobby-subtitle {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.beatlab-lobby-content {
+  flex: 1;
+  padding: 12px;
+  overflow: auto;
+}
+
+.beatlab-room-list {
+  background: #252542;
+  border-radius: 8px;
+  border: 1px solid #3a3a5a;
+  overflow: hidden;
+}
+
+.beatlab-room-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #2e2e4a 0%, #252542 100%);
+  border-bottom: 1px solid #3a3a5a;
+}
+
+.beatlab-room-list-title {
+  font-weight: bold;
+  color: #4ecdc4;
+}
+
+.beatlab-room-list-body {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.beatlab-room-empty {
+  padding: 32px;
+  text-align: center;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.beatlab-room-empty-icon {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+.beatlab-room-empty-sub {
+  font-size: 11px;
+  color: #555;
+}
+
+.beatlab-loading-dots::after {
+  content: '';
+  animation: beatlab-dots 1.5s infinite;
+}
+
+@keyframes beatlab-dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+.beatlab-room-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid #3a3a5a;
+  transition: background 0.15s;
+}
+
+.beatlab-room-item:hover {
+  background: #2a2a4a;
+}
+
+.beatlab-room-item:last-child {
+  border-bottom: none;
+}
+
+.beatlab-room-info {
+  flex: 1;
+}
+
+.beatlab-room-name {
+  font-weight: bold;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.beatlab-room-icon {
+  font-size: 14px;
+}
+
+.beatlab-room-meta {
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.beatlab-room-divider {
+  color: #444;
+  margin: 0 4px;
+}
+
+.beatlab-room-players {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 12px;
+}
+
+.beatlab-room-count {
+  font-size: 12px;
+  color: #4ecdc4;
+  font-weight: bold;
+}
+
+.beatlab-room-avatars {
+  display: flex;
+}
+
+.beatlab-avatar {
+  width: 20px;
+  height: 20px;
+  background: #3a3a5a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  margin-left: -6px;
+  border: 2px solid #252542;
+}
+
+.beatlab-avatar:first-child {
+  margin-left: 0;
+}
+
+.beatlab-lobby-footer {
+  padding: 12px 16px;
+  background: #1e1e38;
+  border-top: 1px solid #3a3a5a;
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.beatlab-btn-small {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.beatlab-btn-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.beatlab-btn-primary {
+  flex: 1;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, #00dd77 0%, #00aa55 100%);
+  border: 1px solid #00ff88;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.beatlab-btn-primary:hover {
+  background: linear-gradient(180deg, #00ff88 0%, #00cc66 100%);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+}
+
+.beatlab-btn-secondary {
+  flex: 1;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, #3a3a5a 0%, #2a2a4a 100%);
+  border: 1px solid #4a4a6a;
+  border-radius: 6px;
+  color: #ccc;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.beatlab-btn-secondary:hover {
+  background: linear-gradient(180deg, #4a4a6a 0%, #3a3a5a 100%);
+}
+
+.beatlab-btn-join {
+  padding: 6px 14px;
+  background: linear-gradient(180deg, #4ecdc4 0%, #3ab5ad 100%);
+  border: 1px solid #4ecdc4;
+  border-radius: 4px;
+  color: #000;
+  font-weight: bold;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.beatlab-btn-join:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5fe3da 0%, #4ecdc4 100%);
+}
+
+.beatlab-btn-join:disabled {
+  background: #3a3a5a;
+  border-color: #3a3a5a;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Dialog */
+.beatlab-dialog-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.beatlab-dialog {
+  background: #252542;
+  border-radius: 8px;
+  border: 1px solid #00ff88;
+  width: 280px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.beatlab-dialog-header {
+  padding: 12px 16px;
+  font-weight: bold;
+  color: #00ff88;
+  border-bottom: 1px solid #3a3a5a;
+}
+
+.beatlab-dialog-body {
+  padding: 16px;
+}
+
+.beatlab-dialog-label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.beatlab-dialog-input {
+  width: 100%;
+  padding: 10px;
+  background: #1a1a2e;
+  border: 1px solid #3a3a5a;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.beatlab-dialog-input:focus {
+  outline: none;
+  border-color: #00ff88;
+}
+
+.beatlab-dialog-footer {
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #3a3a5a;
+}
+
+/* ===== SEQUENCER STYLES ===== */
+.beatlab-sequencer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.beatlab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #252542 0%, #1e1e38 100%);
+  border-bottom: 2px solid #00ff88;
+}
+
+.beatlab-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.beatlab-logo {
+  font-size: 20px;
+}
+
+.beatlab-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+.beatlab-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.beatlab-tempo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1a2e;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #3a3a5a;
+}
+
+.beatlab-tempo label {
+  font-size: 11px;
+  color: #888;
+}
+
+.beatlab-tempo-slider {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #3a3a5a;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.beatlab-tempo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #00ff88;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.beatlab-tempo-value {
+  font-size: 14px;
+  font-weight: bold;
+  color: #00ff88;
+  min-width: 30px;
+  text-align: right;
+}
+
+.beatlab-transport {
+  display: flex;
+  gap: 4px;
+}
+
+.beatlab-btn {
+  width: 36px;
+  height: 32px;
+  background: linear-gradient(180deg, #3a3a5a 0%, #2a2a4a 100%);
+  border: 1px solid #4a4a6a;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beatlab-btn:hover {
+  background: linear-gradient(180deg, #4a4a6a 0%, #3a3a5a 100%);
+}
+
+.beatlab-btn:active {
+  background: linear-gradient(180deg, #2a2a4a 0%, #3a3a5a 100%);
+}
+
+.beatlab-btn.active,
+.beatlab-play.active {
+  background: linear-gradient(180deg, #00aa55 0%, #007744 100%);
+  border-color: #00ff88;
+  color: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.beatlab-leave {
+  margin-left: 8px;
+}
+
+/* Grid Container */
+.beatlab-grid-container {
+  flex: 1;
+  display: flex;
+  padding: 12px;
+  overflow: auto;
+  gap: 8px;
+}
+
+.beatlab-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 18px; /* Align with grid rows under playhead */
+}
+
+.beatlab-label {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+}
+
+.beatlab-label-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.beatlab-label-text {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.beatlab-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Playhead Row */
+.beatlab-playhead-row {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  margin-bottom: 2px;
+}
+
+.beatlab-playhead-indicator {
+  flex: 1;
+  background: #2a2a4a;
+  border-radius: 2px;
+  transition: background 0.05s;
+}
+
+.beatlab-playhead-indicator.beatlab-playhead-beat {
+  background: #333355;
+}
+
+.beatlab-playhead-indicator.active {
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+}
+
+/* Grid Rows */
+.beatlab-row {
+  display: flex;
+  gap: 2px;
+}
+
+.beatlab-cell {
+  flex: 1;
+  height: 28px;
+  background: #252542;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.1s;
+  border: 1px solid transparent;
+}
+
+.beatlab-cell:hover {
+  background: #333355;
+  border-color: var(--track-color, #4a4a6a);
+}
+
+.beatlab-cell.beatlab-cell-beat {
+  background: #2a2a4a;
+}
+
+.beatlab-cell.active {
+  background: var(--track-color, #00ff88);
+  box-shadow: 0 0 6px var(--track-color, rgba(0, 255, 136, 0.5));
+  border-color: transparent;
+}
+
+.beatlab-cell.active:hover {
+  filter: brightness(1.2);
+}
+
+/* Players Bar */
+.beatlab-players {
+  display: flex;
+  gap: 12px;
+  padding: 8px 14px;
+  background: #1e1e38;
+  border-top: 1px solid #3a3a5a;
+}
+
+.beatlab-player {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #252542;
+  border-radius: 4px;
+  border-left: 3px solid var(--player-color, #00ff88);
+}
+
+.beatlab-player-avatar {
+  font-size: 12px;
+}
+
+.beatlab-player-name {
+  font-size: 11px;
+  color: #ccc;
+}
+
+/* Scrollbar styling */
+.beatlab-room-list-body::-webkit-scrollbar,
+.beatlab-grid-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.beatlab-room-list-body::-webkit-scrollbar-track,
+.beatlab-grid-container::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+.beatlab-room-list-body::-webkit-scrollbar-thumb,
+.beatlab-grid-container::-webkit-scrollbar-thumb {
+  background: #3a3a5a;
+  border-radius: 4px;
+}
+
+.beatlab-room-list-body::-webkit-scrollbar-thumb:hover,
+.beatlab-grid-container::-webkit-scrollbar-thumb:hover {
+  background: #4a4a6a;
+}

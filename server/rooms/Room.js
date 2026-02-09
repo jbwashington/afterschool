@@ -1,9 +1,34 @@
-import { OS, MESSAGE_TYPES } from '../../shared/constants.js'
+import { OS, MESSAGE_TYPES, BEATLAB_CONFIG } from '../../shared/constants.js'
 
 export class Room {
   constructor(roomId) {
     this.id = roomId
     this.players = new Map()
+
+    // BeatLab jam state (null if not a music room)
+    this.jamState = null
+  }
+
+  // Initialize this room as a BeatLab music room
+  initJamState(roomName) {
+    this.jamState = {
+      roomName: roomName || 'Untitled Room',
+      pattern: this.createEmptyPattern(),
+      tempo: BEATLAB_CONFIG.DEFAULT_TEMPO,
+      isPlaying: false,
+      createdAt: Date.now()
+    }
+    return this.jamState
+  }
+
+  createEmptyPattern() {
+    return Array(BEATLAB_CONFIG.TRACKS).fill(null).map(() =>
+      Array(BEATLAB_CONFIG.STEPS).fill(false)
+    )
+  }
+
+  isJamRoom() {
+    return this.jamState !== null
   }
 
   get playerCount() {
