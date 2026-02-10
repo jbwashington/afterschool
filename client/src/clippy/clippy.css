@@ -1,0 +1,407 @@
+/* Clippy OS Assistant Styles - XP-inspired */
+
+/* Chat Panel Container */
+.clippy-chat-panel {
+  position: fixed;
+  bottom: 140px;
+  right: 20px;
+  width: 320px;
+  max-height: 400px;
+  background: #ECE9D8;
+  border: 2px solid #0054E3;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  display: none;
+  flex-direction: column;
+  z-index: 10000;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  font-size: 12px;
+}
+
+.clippy-chat-panel.visible {
+  display: flex;
+}
+
+/* XP-style Titlebar */
+.clippy-titlebar {
+  background: linear-gradient(180deg, #0A246A 0%, #0054E3 8%, #0054E3 40%, #0A246A 88%, #0A246A 100%);
+  color: white;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 6px 6px 0 0;
+  cursor: default;
+}
+
+.clippy-titlebar-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.clippy-titlebar-icon {
+  font-size: 14px;
+}
+
+.clippy-close-btn {
+  background: linear-gradient(180deg, #FFA07A 0%, #CD5C5C 50%, #8B0000 100%);
+  border: 1px solid #8B0000;
+  color: white;
+  width: 20px;
+  height: 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.clippy-close-btn:hover {
+  background: linear-gradient(180deg, #FFB6C1 0%, #FF6B6B 50%, #CD5C5C 100%);
+}
+
+.clippy-close-btn:active {
+  background: linear-gradient(180deg, #8B0000 0%, #CD5C5C 50%, #FFA07A 100%);
+}
+
+/* Quick Actions */
+.clippy-quick-actions {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #F1EFE2;
+  border-bottom: 1px solid #ACA899;
+  flex-wrap: wrap;
+}
+
+.clippy-quick-btn {
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECE9D8 100%);
+  border: 1px solid #ACA899;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  color: #333;
+}
+
+.clippy-quick-btn:hover {
+  background: linear-gradient(180deg, #FFF6D5 0%, #FFE7A2 100%);
+  border-color: #E1A200;
+}
+
+.clippy-quick-btn:active {
+  background: linear-gradient(180deg, #FFE7A2 0%, #FFF6D5 100%);
+}
+
+/* Messages Area */
+.clippy-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  max-height: 250px;
+  background: white;
+}
+
+/* Message Bubbles */
+.clippy-message {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.clippy-message.user {
+  align-items: flex-end;
+}
+
+.clippy-message.clippy {
+  align-items: flex-start;
+}
+
+.clippy-message-bubble {
+  max-width: 85%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.clippy-message.user .clippy-message-bubble {
+  background: #DCF8C6;
+  border: 1px solid #AED581;
+  border-radius: 8px 8px 2px 8px;
+}
+
+.clippy-message.clippy .clippy-message-bubble {
+  background: #E3F2FD;
+  border: 1px solid #90CAF9;
+  border-radius: 8px 8px 8px 2px;
+}
+
+.clippy-message-sender {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+/* Tool execution status */
+.clippy-tool-status {
+  background: #FFF3E0;
+  border: 1px solid #FFB74D;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.clippy-tool-status.working {
+  background: #E8F5E9;
+  border-color: #81C784;
+}
+
+.clippy-tool-status.tip {
+  background: #FFFDE7;
+  border-color: #FFF176;
+  margin-top: 4px;
+}
+
+/* Window list in messages */
+.clippy-window-list {
+  margin-top: 6px;
+  padding-left: 16px;
+}
+
+.clippy-window-item {
+  margin: 2px 0;
+  font-size: 11px;
+}
+
+/* Input Area */
+.clippy-input-area {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: #F1EFE2;
+  border-top: 1px solid #ACA899;
+  border-radius: 0 0 6px 6px;
+}
+
+.clippy-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #7F9DB9;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.clippy-input:focus {
+  outline: none;
+  border-color: #316AC5;
+  box-shadow: 0 0 3px rgba(49, 106, 197, 0.5);
+}
+
+.clippy-send-btn {
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECE9D8 100%);
+  border: 1px solid #ACA899;
+  border-radius: 3px;
+  padding: 6px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+}
+
+.clippy-send-btn:hover {
+  background: linear-gradient(180deg, #FFF6D5 0%, #FFE7A2 100%);
+  border-color: #E1A200;
+}
+
+.clippy-send-btn:active {
+  background: linear-gradient(180deg, #FFE7A2 0%, #FFF6D5 100%);
+}
+
+.clippy-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading indicator */
+.clippy-loading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  color: #666;
+  font-style: italic;
+}
+
+.clippy-loading-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.clippy-loading-dot {
+  width: 6px;
+  height: 6px;
+  background: #0054E3;
+  border-radius: 50%;
+  animation: clippy-bounce 1s infinite;
+}
+
+.clippy-loading-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.clippy-loading-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes clippy-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+/* Taskbar Clippy Icon */
+.clippy-taskbar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  margin-right: 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+
+.clippy-taskbar-icon:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.clippy-taskbar-icon:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.clippy-taskbar-icon .icon {
+  font-size: 16px;
+}
+
+.clippy-taskbar-icon .tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FFFFE1;
+  border: 1px solid #000;
+  padding: 2px 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.clippy-taskbar-icon:hover .tooltip {
+  display: block;
+}
+
+/* Tutorial overlay */
+.clippy-tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9998;
+  display: none;
+}
+
+.clippy-tutorial-overlay.visible {
+  display: block;
+}
+
+/* Clippy speech bubble for tutorial */
+.clippy-speech-bubble {
+  position: fixed;
+  background: white;
+  border: 2px solid #0054E3;
+  border-radius: 12px;
+  padding: 12px 16px;
+  max-width: 280px;
+  z-index: 10001;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.clippy-speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 30px;
+  border-width: 10px 10px 0 10px;
+  border-style: solid;
+  border-color: #0054E3 transparent transparent transparent;
+}
+
+.clippy-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 32px;
+  border-width: 8px 8px 0 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.clippy-speech-bubble p {
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.clippy-speech-bubble button {
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECE9D8 100%);
+  border: 1px solid #ACA899;
+  border-radius: 3px;
+  padding: 4px 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.clippy-speech-bubble button:hover {
+  background: linear-gradient(180deg, #FFF6D5 0%, #FFE7A2 100%);
+  border-color: #E1A200;
+}
+
+/* Scrollbar styling */
+.clippy-messages::-webkit-scrollbar {
+  width: 16px;
+}
+
+.clippy-messages::-webkit-scrollbar-track {
+  background: #F1EFE2;
+  border-left: 1px solid #ACA899;
+}
+
+.clippy-messages::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ECE9D8 0%, #ACA899 100%);
+  border: 1px solid #ACA899;
+  border-radius: 0;
+}
+
+.clippy-messages::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F1EFE2 0%, #C5C0B0 100%);
+}
+
+.clippy-messages::-webkit-scrollbar-button {
+  background: linear-gradient(180deg, #ECE9D8 0%, #ACA899 100%);
+  border: 1px solid #ACA899;
+  height: 16px;
+}
+
+.clippy-messages::-webkit-scrollbar-button:hover {
+  background: linear-gradient(180deg, #FFF6D5 0%, #FFE7A2 100%);
+}

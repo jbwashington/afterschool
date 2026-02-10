@@ -14,6 +14,7 @@ import { NetworkClient } from './network/NetworkClient.js'
 import { CursorSync } from './multiplayer/CursorSync.js'
 import { RemoteCursorManager } from './multiplayer/RemoteCursor.js'
 import { MESSAGE_TYPES } from '../../shared/constants.js'
+import { Clippy } from './clippy/Clippy.js'
 
 class SixSevenOS {
   constructor() {
@@ -29,6 +30,7 @@ class SixSevenOS {
     this.playerId = null
     this.playerNumber = null
     this.roomId = null
+    this.clippy = null
   }
 
   async init() {
@@ -86,6 +88,11 @@ class SixSevenOS {
         this.startMenu.close()
       }
     })
+
+    // Initialize Clippy OS Assistant
+    this.clippy = new Clippy(this)
+    this.taskbar.onClippyClick = () => this.clippy.toggle()
+    await this.clippy.init()
 
     console.log('sixsevenOS initialized')
   }

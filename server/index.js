@@ -3,6 +3,7 @@ import { WebSocketServer } from 'ws'
 import { RoomManager } from './rooms/RoomManager.js'
 import { MESSAGE_TYPES, BEATLAB_MESSAGE_TYPES, BEATLAB_CONFIG } from '../shared/constants.js'
 import { handleOllamaChat, handleGenerateAgent, handleAgentDialogue, rateLimitMiddleware } from './api/ollama.js'
+import { handleClippyChat } from './api/clippy.js'
 
 const WS_PORT = process.env.WS_PORT || 6767
 const HTTP_PORT = process.env.HTTP_PORT || 6768
@@ -94,6 +95,19 @@ const httpServer = createServer(async (req, res) => {
       await handleAgentDialogue(reqWrapper, resWrapper)
     } catch (error) {
       console.error('Dialogue generation error:', error)
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: 'Internal server error' }))
+    }
+    return
+  }
+
+  // Route: POST /api/clippy/chat (Clippy OS Assistant)
+  if (url.pathname === '/api/clippy/chat' && req.method === 'POST') {
+    try {
+      reqWrapper.body = await parseBody()
+      await handleClippyChat(reqWrapper, resWrapper)
+    } catch (error) {
+      console.error('Clippy chat error:', error)
       res.writeHead(500, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ error: 'Internal server error' }))
     }

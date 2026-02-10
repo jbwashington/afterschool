@@ -5,8 +5,10 @@ export class Taskbar {
     this.element = null
     this.taskButtonsContainer = null
     this.clockElement = null
+    this.systemTray = null
     this.taskButtons = new Map()
     this.clockInterval = null
+    this.onClippyClick = null
   }
 
   init() {
@@ -37,16 +39,30 @@ export class Taskbar {
     this.taskButtonsContainer.className = 'xp-task-buttons'
 
     // System tray
-    const systemTray = document.createElement('div')
-    systemTray.className = 'xp-system-tray'
+    this.systemTray = document.createElement('div')
+    this.systemTray.className = 'xp-system-tray'
+
+    // Clippy icon in system tray
+    const clippyIcon = document.createElement('div')
+    clippyIcon.className = 'clippy-taskbar-icon'
+    clippyIcon.innerHTML = `
+      <span class="icon">📎</span>
+      <span class="tooltip">Clippy - OS Helper</span>
+    `
+    clippyIcon.addEventListener('click', () => {
+      if (this.onClippyClick) {
+        this.onClippyClick()
+      }
+    })
+    this.systemTray.appendChild(clippyIcon)
 
     this.clockElement = document.createElement('span')
     this.clockElement.className = 'xp-clock'
-    systemTray.appendChild(this.clockElement)
+    this.systemTray.appendChild(this.clockElement)
 
     this.element.appendChild(startButton)
     this.element.appendChild(this.taskButtonsContainer)
-    this.element.appendChild(systemTray)
+    this.element.appendChild(this.systemTray)
 
     document.body.appendChild(this.element)
   }
