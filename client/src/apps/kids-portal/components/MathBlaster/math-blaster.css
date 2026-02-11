@@ -1,0 +1,159 @@
+/* Math Blaster Zone — space purple/neon theme */
+
+.mathblaster-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0020 0%, #1a0044 50%, #0a0030 100%);
+  color: #cc88ff;
+  font-family: 'Comic Sans MS', cursive;
+}
+
+.mathblaster-loading-spinner {
+  font-size: 48px;
+  animation: mathblaster-spin 1s linear infinite;
+}
+
+@keyframes mathblaster-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.mathblaster-loading-text {
+  margin-top: 16px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.mathblaster-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0a0020;
+}
+
+.mathblaster-back-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  background: linear-gradient(90deg, #1a0044, #2a0066);
+  border-bottom: 2px solid #7733ff;
+  flex-shrink: 0;
+}
+
+.mathblaster-back-btn {
+  background: #331177;
+  border: 1px solid #7733ff;
+  color: #cc88ff;
+  padding: 2px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 13px;
+}
+
+.mathblaster-back-btn:hover {
+  background: #4422aa;
+  color: #ffffff;
+}
+
+.mathblaster-title {
+  color: #cc88ff;
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #7733ff;
+}
+
+.mathblaster-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mathblaster-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  cursor: crosshair;
+}
+
+.mathblaster-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* HUD overlay — pointer-events:none so clicks pass through to canvas */
+.mathblaster-hud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Mute button needs pointer events */
+.mathblaster-mute-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  pointer-events: auto;
+  background: rgba(30, 0, 60, 0.7);
+  border: 1px solid #7733ff;
+  color: #cc88ff;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.mathblaster-mute-btn:hover {
+  background: rgba(60, 0, 120, 0.8);
+  color: #ffffff;
+}
+
+/* Screen shake animation */
+@keyframes mathblaster-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.mathblaster-shake {
+  animation: mathblaster-shake 0.3s ease-out;
+}
+
+/* Red flash on wrong answer */
+@keyframes mathblaster-flash-red {
+  0% { box-shadow: inset 0 0 40px rgba(255, 0, 0, 0.5); }
+  100% { box-shadow: inset 0 0 0px rgba(255, 0, 0, 0); }
+}
+
+.mathblaster-flash-red {
+  animation: mathblaster-flash-red 0.3s ease-out;
+}
+
+/* Green flash on correct */
+@keyframes mathblaster-flash-green {
+  0% { box-shadow: inset 0 0 40px rgba(0, 255, 136, 0.4); }
+  100% { box-shadow: inset 0 0 0px rgba(0, 255, 136, 0); }
+}
+
+.mathblaster-flash-green {
+  animation: mathblaster-flash-green 0.3s ease-out;
+}

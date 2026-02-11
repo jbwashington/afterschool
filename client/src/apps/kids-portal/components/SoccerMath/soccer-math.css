@@ -1,0 +1,498 @@
+/* Soccer Math - Sports Arena Game */
+
+/* Container */
+.soccermath-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a472a;
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+  color: white;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Back bar */
+.soccermath-back-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #00cc44 0%, #00aa33 100%);
+  border-bottom: 3px solid #000;
+  z-index: 10;
+}
+
+.soccermath-back-btn {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.soccermath-back-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.soccermath-bar-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Game area: canvas + HUD overlay */
+.soccermath-game-area {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.soccermath-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* HUD overlay on top of canvas */
+.soccermath-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scoreboard */
+.soccermath-scoreboard {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 10px 16px;
+  pointer-events: none;
+}
+
+.soccermath-stat {
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.soccermath-stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.soccermath-stat-value {
+  color: #fff;
+  font-size: 16px;
+}
+
+.soccermath-lives {
+  color: #ff4444;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.soccermath-streak {
+  color: #ffcc00;
+}
+
+/* Problem area (bottom) */
+.soccermath-problem-area {
+  margin-top: auto;
+  padding: 16px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 80%, transparent 100%);
+  pointer-events: auto;
+}
+
+.soccermath-visual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* Number bond diagram */
+.soccermath-bond {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.soccermath-bond-whole {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffcc00;
+  border: 3px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+}
+
+.soccermath-bond-lines {
+  width: 80px;
+  height: 20px;
+  position: relative;
+}
+
+.soccermath-bond-lines::before,
+.soccermath-bond-lines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: #fff;
+}
+
+.soccermath-bond-lines::before {
+  left: 16px;
+  transform: rotate(-20deg);
+}
+
+.soccermath-bond-lines::after {
+  right: 16px;
+  transform: rotate(20deg);
+}
+
+.soccermath-bond-parts {
+  display: flex;
+  gap: 30px;
+}
+
+.soccermath-bond-part {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #4488ff;
+  border: 3px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.soccermath-bond-unknown {
+  background: #ff4444;
+  animation: soccermath-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes soccermath-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 68, 68, 0); }
+  50% { transform: scale(1.08); box-shadow: 0 0 12px rgba(255, 68, 68, 0.5); }
+}
+
+/* Fraction visual: grid of ball emojis */
+.soccermath-fraction-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  max-width: 260px;
+}
+
+.soccermath-fraction-ball {
+  font-size: 22px;
+  transition: transform 0.2s;
+}
+
+.soccermath-fraction-ball.highlighted {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 4px gold);
+}
+
+/* Equation visual */
+.soccermath-equation {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 4px;
+}
+
+.soccermath-equation-blank {
+  display: inline-block;
+  width: 48px;
+  height: 40px;
+  border: 3px dashed #ff4444;
+  border-radius: 6px;
+  vertical-align: middle;
+  background: rgba(255, 68, 68, 0.2);
+  animation: soccermath-pulse 1.2s ease-in-out infinite;
+}
+
+/* Decompose: target number + pair hint */
+.soccermath-decompose {
+  text-align: center;
+}
+
+.soccermath-decompose-target {
+  font-size: 36px;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.soccermath-decompose-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+/* Question text */
+.soccermath-question {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Answer choices */
+.soccermath-choices {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.soccermath-choice-btn {
+  min-width: 80px;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #4488ff 0%, #2266dd 100%);
+  border: 3px solid #000;
+  border-radius: 10px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.soccermath-choice-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #5599ff 0%, #3377ee 100%);
+}
+
+.soccermath-choice-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.soccermath-choice-btn.correct {
+  background: linear-gradient(180deg, #44cc44 0%, #228822 100%);
+  border-color: #00ff00;
+}
+
+.soccermath-choice-btn.wrong {
+  background: linear-gradient(180deg, #cc4444 0%, #882222 100%);
+  border-color: #ff0000;
+}
+
+.soccermath-choice-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Title screen overlay */
+.soccermath-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.soccermath-overlay-title {
+  font-size: 42px;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 20px rgba(255, 204, 0, 0.4);
+  margin-bottom: 8px;
+}
+
+.soccermath-overlay-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.soccermath-overlay-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 24px;
+}
+
+.soccermath-overlay-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.soccermath-overlay-stat {
+  text-align: center;
+}
+
+.soccermath-overlay-stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.soccermath-overlay-stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+.soccermath-play-btn {
+  padding: 16px 48px;
+  background: linear-gradient(180deg, #44cc44 0%, #228822 100%);
+  border: 4px solid #000;
+  border-radius: 12px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.soccermath-play-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.soccermath-play-btn:active {
+  transform: translateY(2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Level complete banner */
+.soccermath-level-banner {
+  font-size: 28px;
+  font-weight: bold;
+  color: #00ff00;
+  text-shadow: 2px 2px 0 #000;
+  animation: soccermath-bounce 0.6s ease;
+}
+
+@keyframes soccermath-bounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Game over */
+.soccermath-gameover-score {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+}
+
+/* Loading screen */
+.soccermath-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #1a472a;
+  gap: 16px;
+}
+
+.soccermath-loading-spinner {
+  font-size: 48px;
+  animation: soccermath-spin 1s linear infinite;
+}
+
+@keyframes soccermath-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.soccermath-loading-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+}
+
+/* Confetti particles */
+.soccermath-confetti {
+  position: absolute;
+  pointer-events: none;
+  font-size: 16px;
+  z-index: 15;
+  animation: soccermath-confetti-fall 1.5s ease-out forwards;
+}
+
+@keyframes soccermath-confetti-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(120px) rotate(720deg) scale(0.3); }
+}
+
+/* Feedback flash */
+.soccermath-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 12;
+  animation: soccermath-flash-anim 0.4s ease-out forwards;
+}
+
+.soccermath-flash.goal {
+  background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.3) 0%, transparent 70%);
+}
+
+.soccermath-flash.save {
+  background: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.3) 0%, transparent 70%);
+}
+
+@keyframes soccermath-flash-anim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}

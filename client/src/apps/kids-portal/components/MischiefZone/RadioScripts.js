@@ -1,0 +1,121 @@
+// Pre-written walkie-talkie conversation scripts
+// Each channel has a name, frequency, and lines of dialogue
+
+export const RADIO_CHANNELS = [
+  {
+    id: 1,
+    name: 'Construction Crew',
+    frequency: '148.250',
+    lines: [
+      { speaker: 'FOREMAN', text: 'Dave, where did you put the drill?' },
+      { speaker: 'DAVE', text: 'I left it by the... uh... the orange cone.' },
+      { speaker: 'FOREMAN', text: 'Dave, there are 400 orange cones.' },
+      { speaker: 'DAVE', text: 'The big one?' },
+      { speaker: 'FOREMAN', text: "They're ALL big, Dave." },
+      { speaker: 'RICK', text: "Hey uh... there's a squirrel on the crane again." },
+      { speaker: 'FOREMAN', text: 'Just ignore it.' },
+      { speaker: 'RICK', text: "It's wearing Dave's hard hat." },
+      { speaker: 'DAVE', text: 'THAT is where my hard hat went!' },
+      { speaker: 'FOREMAN', text: "I'm taking my lunch break." },
+      { speaker: 'RICK', text: 'The squirrel ate your sandwich.' },
+      { speaker: 'FOREMAN', text: '...I quit.' },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Alien Recon Team',
+    frequency: '327.880',
+    lines: [
+      { speaker: 'ZORP', text: 'Earth report: the humans are throwing a flat circle into the sky.' },
+      { speaker: 'BLIX', text: 'A weapon?!' },
+      { speaker: 'ZORP', text: 'No. A small furry unit runs to catch it... in its MOUTH.' },
+      { speaker: 'BLIX', text: 'Disgusting. Continue surveillance.' },
+      { speaker: 'ZORP', text: 'The furry unit is attached to a rope. The human holds the other end.' },
+      { speaker: 'BLIX', text: "So the human has captured the creature. It's a prisoner?" },
+      { speaker: 'ZORP', text: 'Negative. The furry unit appears to be in charge. The human picks up its waste.' },
+      { speaker: 'BLIX', text: '...The HUMAN picks up the waste??' },
+      { speaker: 'ZORP', text: 'Affirmative. In a small bag. Then carries it.' },
+      { speaker: 'BLIX', text: 'These creatures are more advanced than we thought.' },
+      { speaker: 'ZORP', text: 'The small humans appear to be doing something called "homework."' },
+      { speaker: 'BLIX', text: 'What is the purpose?' },
+      { speaker: 'ZORP', text: 'Unknown. It causes great suffering.' },
+    ]
+  },
+  {
+    id: 3,
+    name: 'Pirate Ship',
+    frequency: '192.750',
+    lines: [
+      { speaker: "CAP'N", text: 'ARRR! First mate, read me the treasure map!' },
+      { speaker: 'FIRST MATE', text: "Aye cap'n... go north past the skull rock..." },
+      { speaker: "CAP'N", text: 'Wait. Is that north or south?' },
+      { speaker: 'FIRST MATE', text: "Well it depends which way ye hold the map, cap'n." },
+      { speaker: "CAP'N", text: "I've been holding it upside down." },
+      { speaker: 'FIRST MATE', text: "That explains why we've been sailing in circles for three days." },
+      { speaker: 'LOOKOUT', text: 'LAND HO!' },
+      { speaker: "CAP'N", text: 'Is it the treasure island?!' },
+      { speaker: 'LOOKOUT', text: "It's a Burger King, cap'n." },
+      { speaker: "CAP'N", text: '...Do they have chicken nuggets?' },
+      { speaker: 'LOOKOUT', text: 'Aye.' },
+      { speaker: "CAP'N", text: 'DROP ANCHOR! We feast!' },
+    ]
+  },
+  {
+    id: 4,
+    name: 'Secret Agents',
+    frequency: '401.120',
+    lines: [
+      { speaker: 'AGENT PICKLE', text: 'Big Banana, do you copy? Over.' },
+      { speaker: 'BIG BANANA', text: 'This is Big Banana. Go ahead, Agent Pickle. Over.' },
+      { speaker: 'AGENT PICKLE', text: 'The eagle has landed in the pudding. I repeat: eagle in the pudding.' },
+      { speaker: 'BIG BANANA', text: 'Copy. Is the pudding chocolate or vanilla?' },
+      { speaker: 'AGENT PICKLE', text: '...Does it matter?' },
+      { speaker: 'BIG BANANA', text: "It's critical to the mission, Pickle." },
+      { speaker: 'AGENT PICKLE', text: 'Butterscotch.' },
+      { speaker: 'BIG BANANA', text: 'Butterscotch?! That changes EVERYTHING.' },
+      { speaker: 'AGENT PICKLE', text: 'Should I activate Operation Silly String?' },
+      { speaker: 'BIG BANANA', text: 'Negative. Deploy the rubber chicken.' },
+      { speaker: 'AGENT PICKLE', text: 'The rubber chicken is still in the washing machine from last mission.' },
+      { speaker: 'BIG BANANA', text: "This is why we can't have nice things, Pickle." },
+    ]
+  },
+  {
+    id: 5,
+    name: 'Zoo Animals',
+    frequency: '256.440',
+    lines: [
+      { speaker: 'MONKEY', text: 'Alright everyone, tonight is the night. The Great Escape.' },
+      { speaker: 'PENGUIN', text: 'Did everyone memorize the plan?' },
+      { speaker: 'GIRAFFE', text: "I can't fit through the air vent." },
+      { speaker: 'MONKEY', text: 'We discussed this, Gerald. You go OVER the wall.' },
+      { speaker: 'GIRAFFE', text: "My name isn't Gerald." },
+      { speaker: 'MONKEY', text: 'Everyone is Gerald during the mission. Security reasons.' },
+      { speaker: 'PENGUIN', text: 'I have the key card. I stole it from the zookeeper during fish time.' },
+      { speaker: 'PARROT', text: "PRETTY BIRD! PRETTY BIRD! ...sorry, force of habit." },
+      { speaker: 'MONKEY', text: 'SHHH! Do you want to blow our cover?!' },
+      { speaker: 'TURTLE', text: "I'll be at the rendezvous point in... approximately 4 hours." },
+      { speaker: 'MONKEY', text: "The gate opens in 5 minutes." },
+      { speaker: 'TURTLE', text: 'So I should have left yesterday. Got it.' },
+    ]
+  },
+  {
+    id: 6,
+    name: 'Fast Food Drive-Thru',
+    frequency: '173.900',
+    lines: [
+      { speaker: 'CASHIER', text: 'Welcome to Burger Barn. May I take your order?' },
+      { speaker: 'CUSTOMER', text: "I'll have a pizza." },
+      { speaker: 'CASHIER', text: "Sir this is a Burger Barn. We don't sell pizza." },
+      { speaker: 'CUSTOMER', text: 'Okay, a pizza with no cheese then.' },
+      { speaker: 'CASHIER', text: "We... still don't have pizza." },
+      { speaker: 'CUSTOMER', text: "Fine. I'll have a burger shaped like a pizza." },
+      { speaker: 'CASHIER', text: "I... sure. Anything else?" },
+      { speaker: 'CUSTOMER', text: 'Do your milkshakes come in invisible flavor?' },
+      { speaker: 'CASHIER', text: 'We have chocolate, vanilla, and strawberry.' },
+      { speaker: 'CUSTOMER', text: 'What about dinosaur flavor?' },
+      { speaker: 'CASHIER', text: "That's not a flavor, sir." },
+      { speaker: 'CUSTOMER', text: "You don't KNOW that. Have you ever tasted a dinosaur?" },
+      { speaker: 'CASHIER', text: '...You make a fair point.' },
+    ]
+  },
+]

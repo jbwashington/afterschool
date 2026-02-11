@@ -4,13 +4,10 @@ export const ZONES = [
     name: 'Fly Zone',
     icon: '🚁',
     color: '#0066ff',
-    description: 'Learn about drones, flying machines, and aeronautics!',
-    categories: [
-      { id: 'how-drones-work', label: 'How Drones Work', icon: '⚙️' },
-      { id: 'drone-building', label: 'Build Your Own', icon: '🔧' },
-      { id: 'flight-simulators', label: 'Flight Simulators', icon: '🎮' },
-      { id: 'famous-pilots', label: 'Famous Pilots', icon: '✈️' },
-    ]
+    description: 'Fly a drone around a 3D park!',
+    categories: [],
+    isFlyZone: true,
+    isNew: true
   },
   {
     id: 'robot-lab',
@@ -30,13 +27,10 @@ export const ZONES = [
     name: 'Sports Arena',
     icon: '⚽',
     color: '#00cc44',
-    description: 'Soccer, sports stars, and athletic adventures!',
-    categories: [
-      { id: 'soccer-skills', label: 'Soccer Skills', icon: '🎯' },
-      { id: 'famous-players', label: 'Famous Players', icon: '⭐' },
-      { id: 'world-cup', label: 'World Cup History', icon: '🏆' },
-      { id: 'sports-games', label: 'Sports Games', icon: '🎮' },
-    ]
+    description: 'Score goals with math power!',
+    categories: [],
+    isSportsArena: true,
+    isNew: true
   },
   {
     id: 'kid-biz',
@@ -74,6 +68,16 @@ export const ZONES = [
     ]
   },
   {
+    id: 'math-blaster',
+    name: 'Math Blaster',
+    icon: '🚀',
+    color: '#7733ff',
+    description: 'Blast asteroids with math power!',
+    categories: [],
+    isMathBlaster: true,
+    isNew: true
+  },
+  {
     id: 'maker-space',
     name: 'Maker Space',
     icon: '🔧',
@@ -94,6 +98,16 @@ export const ZONES = [
     description: 'Your friendly AI buddy to help with questions!',
     categories: [],
     isAIHelper: true
+  },
+  {
+    id: 'mischief-zone',
+    name: 'Mischief Zone',
+    icon: '😈',
+    color: '#00ff41',
+    description: 'Soundboard, walkie-talkie scanner & pranks!',
+    categories: [],
+    isMischiefZone: true,
+    isNew: true
   },
   {
     id: 'my-stuff',

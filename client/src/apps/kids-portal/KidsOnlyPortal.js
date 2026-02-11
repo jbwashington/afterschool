@@ -2,6 +2,10 @@ import { BaseApp } from '../BaseApp.js'
 import { ZONES, getZoneById } from './zones/ZoneConfig.js'
 import { AIHelper } from './components/AIHelper.js'
 import { KidBizEmpire } from './components/KidBizEmpire.js'
+import { FlyZoneComponent } from './components/FlyZone/FlyZoneComponent.js'
+import { MischiefZoneComponent } from './components/MischiefZone/MischiefZoneComponent.js'
+import { MathBlasterComponent } from './components/MathBlaster/MathBlasterComponent.js'
+import { SoccerMathComponent } from './components/SoccerMath/SoccerMathComponent.js'
 
 export class KidsOnlyPortal extends BaseApp {
   constructor(window, windowManager) {
@@ -10,6 +14,10 @@ export class KidsOnlyPortal extends BaseApp {
     this.currentZone = null
     this.aiHelper = null
     this.kidBizEmpire = null
+    this.flyZone = null
+    this.mischiefZone = null
+    this.mathBlaster = null
+    this.soccerMath = null
     this.elements = {}
   }
 
@@ -79,11 +87,28 @@ export class KidsOnlyPortal extends BaseApp {
       this.kidBizEmpire.destroy()
       this.kidBizEmpire = null
     }
+    if (this.flyZone) {
+      this.flyZone.destroy()
+      this.flyZone = null
+    }
+    if (this.mischiefZone) {
+      this.mischiefZone.destroy()
+      this.mischiefZone = null
+    }
+    if (this.mathBlaster) {
+      this.mathBlaster.destroy()
+      this.mathBlaster = null
+    }
+    if (this.soccerMath) {
+      this.soccerMath.destroy()
+      this.soccerMath = null
+    }
 
     this.elements.main.innerHTML = `
       <div class="kids-portal-zones">
         ${ZONES.map(zone => `
           <button class="kids-portal-zone-btn" data-zone="${zone.id}">
+            ${zone.isNew ? '<span class="kids-portal-new-badge">NEW!</span>' : ''}
             <span class="kids-portal-zone-icon">${zone.icon}</span>
             <span class="kids-portal-zone-name">${zone.name}</span>
           </button>
@@ -118,6 +143,30 @@ export class KidsOnlyPortal extends BaseApp {
     // If it's the Kid Biz Empire zone, show the game
     if (zone.isKidBizEmpire) {
       this.showKidBizEmpire()
+      return
+    }
+
+    // If it's the Fly Zone, show the drone simulator
+    if (zone.isFlyZone) {
+      this.showFlyZone()
+      return
+    }
+
+    // If it's the Mischief Zone, show comedy & pranks
+    if (zone.isMischiefZone) {
+      this.showMischiefZone()
+      return
+    }
+
+    // If it's Math Blaster, show the space shooter
+    if (zone.isMathBlaster) {
+      this.showMathBlaster()
+      return
+    }
+
+    // If it's the Sports Arena, show Soccer Math
+    if (zone.isSportsArena) {
+      this.showSoccerMath()
       return
     }
 
@@ -169,6 +218,30 @@ export class KidsOnlyPortal extends BaseApp {
     this.kidBizEmpire.init()
   }
 
+  showFlyZone() {
+    this.elements.main.innerHTML = ''
+    this.flyZone = new FlyZoneComponent(this.elements.main, () => this.showHome())
+    this.flyZone.init()
+  }
+
+  showMischiefZone() {
+    this.elements.main.innerHTML = ''
+    this.mischiefZone = new MischiefZoneComponent(this.elements.main, () => this.showHome())
+    this.mischiefZone.init()
+  }
+
+  showMathBlaster() {
+    this.elements.main.innerHTML = ''
+    this.mathBlaster = new MathBlasterComponent(this.elements.main, () => this.showHome())
+    this.mathBlaster.init()
+  }
+
+  showSoccerMath() {
+    this.elements.main.innerHTML = ''
+    this.soccerMath = new SoccerMathComponent(this.elements.main, () => this.showHome())
+    this.soccerMath.init()
+  }
+
   onFocus() {
     // Could add sound effect or animation here
   }
@@ -185,6 +258,22 @@ export class KidsOnlyPortal extends BaseApp {
     if (this.kidBizEmpire) {
       this.kidBizEmpire.destroy()
       this.kidBizEmpire = null
+    }
+    if (this.flyZone) {
+      this.flyZone.destroy()
+      this.flyZone = null
+    }
+    if (this.mischiefZone) {
+      this.mischiefZone.destroy()
+      this.mischiefZone = null
+    }
+    if (this.mathBlaster) {
+      this.mathBlaster.destroy()
+      this.mathBlaster = null
+    }
+    if (this.soccerMath) {
+      this.soccerMath.destroy()
+      this.soccerMath = null
     }
     super.destroy()
   }

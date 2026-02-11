@@ -1,0 +1,333 @@
+/* FlyZone Drone Simulator Styles */
+
+.flyzone-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #001133;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+  color: #ffffff;
+}
+
+.flyzone-loading-spinner {
+  font-size: 48px;
+  animation: flyzone-spin 1s linear infinite;
+}
+
+@keyframes flyzone-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.flyzone-loading-text {
+  margin-top: 12px;
+  font-size: 16px;
+  color: #88bbff;
+}
+
+/* Main container */
+.flyzone-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #000;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+}
+
+/* Top bar */
+.flyzone-back-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  background: linear-gradient(to bottom, #003399, #001a66);
+  border-bottom: 2px solid #0055cc;
+  flex-shrink: 0;
+}
+
+.flyzone-back-btn {
+  background: linear-gradient(to bottom, #ffcc00, #ff9900);
+  border: 2px solid #cc7700;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+.flyzone-back-btn:hover {
+  background: linear-gradient(to bottom, #ffdd44, #ffaa22);
+}
+
+.flyzone-title {
+  color: #ffcc00;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(255, 200, 0, 0.5);
+}
+
+/* Viewport area */
+.flyzone-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.flyzone-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.flyzone-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.flyzone-hud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* HUD overlay */
+.flyzone-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+}
+
+.flyzone-hud-top {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.flyzone-hud-btn {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+}
+
+.flyzone-hud-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.flyzone-hud-cam {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: #88ff88;
+  font-size: 11px;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+
+/* Bottom HUD bar */
+.flyzone-hud-bottom {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.flyzone-hud-stat {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flyzone-hud-label {
+  color: #88bbff;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.flyzone-hud-value {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  min-width: 40px;
+}
+
+/* Battery bar */
+.flyzone-battery-bar {
+  width: 50px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.flyzone-battery-fill {
+  height: 100%;
+  width: 100%;
+  background-color: #00cc44;
+  transition: width 0.3s, background-color 0.3s;
+  border-radius: 2px;
+}
+
+.flyzone-battery-low {
+  animation: flyzone-battery-flash 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes flyzone-battery-flash {
+  from { opacity: 1; }
+  to { opacity: 0.4; }
+}
+
+/* Compass */
+.flyzone-compass {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flyzone-compass-arrow {
+  color: #ff4444;
+  font-size: 12px;
+  font-weight: bold;
+  transition: transform 0.15s;
+}
+
+/* Flash message */
+.flyzone-flash {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffcc00;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 200, 0, 0.8), 2px 2px 0 #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flyzone-flash-anim {
+  animation: flyzone-flash-pop 1.5s ease-out forwards;
+}
+
+@keyframes flyzone-flash-pop {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1.0); }
+}
+
+/* Control hints */
+.flyzone-hints {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 20, 0.7);
+  pointer-events: none;
+}
+
+.flyzone-hints-content {
+  background: rgba(0, 20, 60, 0.9);
+  border: 2px solid #0055cc;
+  border-radius: 8px;
+  padding: 16px 24px;
+  max-width: 320px;
+}
+
+.flyzone-hints-title {
+  color: #ffcc00;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.flyzone-hints-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #ccc;
+  font-size: 12px;
+}
+
+.flyzone-hints-grid kbd {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 11px;
+  font-family: monospace;
+  color: #fff;
+  margin-right: 2px;
+}
+
+.flyzone-hints-tip {
+  color: #88ff88;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Focus overlay */
+.flyzone-focus-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.flyzone-focus-text {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: flyzone-pulse 2s ease-in-out infinite;
+}
+
+@keyframes flyzone-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
